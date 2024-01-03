@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiElement;
+import com.intellij.ui.treeStructure.Tree;
 import com.sjhy.plugin.dict.GlobalDict;
 import com.sjhy.plugin.service.TableInfoSettingsService;
 import com.sjhy.plugin.tool.CacheDataUtils;
@@ -25,7 +26,7 @@ public class MainActionGroup extends ActionGroup {
     /**
      * 缓存数据工具类
      */
-    private CacheDataUtils cacheDataUtils = CacheDataUtils.getInstance();
+    private final CacheDataUtils cacheDataUtils = CacheDataUtils.getInstance();
 
     /**
      * 是否不存在子菜单
@@ -33,29 +34,17 @@ public class MainActionGroup extends ActionGroup {
     private boolean notExistsChildren;
 
     /**
-     * 是否分组按钮
-     *
-     * @return 是否隐藏
-     */
-    @Override
-    public boolean hideIfNoVisibleChildren() {
-        return this.notExistsChildren;
-    }
-
-
-    /**
      * 根据右键在不同的选项上展示不同的子菜单
      *
      * @param event 事件对象
      * @return 动作组
      */
-    @NotNull
     @Override
-    public AnAction[] getChildren(@Nullable AnActionEvent event) {
+    public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
         // 获取当前项目
         Project project = getEventProject(event);
         if (project == null) {
-            return getEmptyAnAction();
+            return getEmptyAnAction(event);
         }
 
         //获取选中的PSI元素
@@ -65,12 +54,12 @@ public class MainActionGroup extends ActionGroup {
             selectDbTable = (DbTable) psiElement;
         }
         if (selectDbTable == null) {
-            return getEmptyAnAction();
+            return getEmptyAnAction(event);
         }
         //获取选中的所有表
         PsiElement[] psiElements = event.getData(LangDataKeys.PSI_ELEMENT_ARRAY);
         if (psiElements == null || psiElements.length == 0) {
-            return getEmptyAnAction();
+            return getEmptyAnAction(event);
         }
         List<DbTable> dbTableList = new ArrayList<>();
         for (PsiElement element : psiElements) {
@@ -81,13 +70,13 @@ public class MainActionGroup extends ActionGroup {
             dbTableList.add(dbTable);
         }
         if (dbTableList.isEmpty()) {
-            return getEmptyAnAction();
+            return getEmptyAnAction(event);
         }
 
         //保存数据到缓存
         cacheDataUtils.setDbTableList(dbTableList);
         cacheDataUtils.setSelectDbTable(selectDbTable);
-        this.notExistsChildren = false;
+        this.visibleGroup(event.getPresentation(), false);
         return getMenuList();
     }
 
@@ -133,8 +122,20 @@ public class MainActionGroup extends ActionGroup {
      *
      * @return 空菜单组
      */
-    private AnAction[] getEmptyAnAction() {
-        this.notExistsChildren = true;
+    private AnAction[] getEmptyAnAction(AnActionEvent actionEvent) {
+        this.visibleGroup(actionEvent.getPresentation(), true);
         return AnAction.EMPTY_ARRAY;
     }
+
+    /**
+     * 显示隐藏Group
+     *
+     * @param presentation presentation
+     * @param hideGroup    isShowGroup
+     */
+    private void visibleGroup(Presentation presentation, boolean hideGroup) {
+        // 设置是否隐藏该组
+        presentation.setHideGroupIfEmpty(hideGroup);
+    }
+
 }

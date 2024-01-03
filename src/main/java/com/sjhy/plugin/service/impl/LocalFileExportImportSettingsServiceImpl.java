@@ -35,6 +35,9 @@ import java.nio.charset.StandardCharsets;
  * @date 2021/08/11 17:28
  */
 public class LocalFileExportImportSettingsServiceImpl implements ExportImportSettingsService {
+
+    private static final String SYSTEM_MESSAGES_GROUP_ID = "System Messages";
+
     /**
      * 导出设置
      *
@@ -62,7 +65,7 @@ public class LocalFileExportImportSettingsServiceImpl implements ExportImportSet
 
                 // 发起通知
                 Notification notification = new Notification(
-                        Notifications.SYSTEM_MESSAGES_GROUP_ID,
+                        SYSTEM_MESSAGES_GROUP_ID,
                         "Easy code notify",
                         "Easy code config file export to",
                         NotificationType.INFORMATION);
