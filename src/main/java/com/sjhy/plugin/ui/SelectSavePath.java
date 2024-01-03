@@ -1,5 +1,6 @@
 package com.sjhy.plugin.ui;
 
+import com.intellij.ide.util.PackageChooserDialog;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
@@ -8,6 +9,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiPackage;
+import com.intellij.ui.treeStructure.Tree;
 import com.intellij.util.ExceptionUtil;
 import com.sjhy.plugin.constants.StrState;
 import com.sjhy.plugin.dict.GlobalDict;
@@ -26,12 +29,17 @@ import com.sjhy.plugin.ui.component.TemplateSelectComponent;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -175,7 +183,19 @@ public class SelectSavePath extends DialogWrapper {
             packageChooseButton.addActionListener(e -> {
                 try {
                     Constructor<?> constructor = cls.getConstructor(String.class, Project.class);
-                    Object dialog = constructor.newInstance("Package Chooser", project);
+                    PackageChooserDialog dialog = (PackageChooserDialog) constructor.newInstance("Package Chooser", project);
+                    // 默认展开所有
+                    Tree tree = (Tree) dialog.getPreferredFocusedComponent();
+                    if (tree != null) {
+                        TreeModel treeModel = tree.getModel();
+                        if (treeModel != null) {
+                            TreeNode basePackageTreeNode = this.getProjectBasePackageTreeNode((TreeNode) treeModel.getRoot());
+                            TreePath basePackageTreePath = this.treeNodeToTreePath(basePackageTreeNode);
+                            String basePackage = this.treePathToPackageName(basePackageTreePath);
+                            tree.expandPath(basePackageTreePath);
+                            dialog.selectPackage(basePackage);
+                        }
+                    }
                     // 显示窗口
                     Method showMethod = cls.getMethod("show");
                     showMethod.invoke(dialog);
@@ -189,7 +209,8 @@ public class SelectSavePath extends DialogWrapper {
                         // 刷新路径
                         refreshPath();
                     }
-                } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e1) {
+                } catch (NoSuchMethodException | IllegalAccessException | InstantiationException |
+                         InvocationTargetException e1) {
                     ExceptionUtil.rethrow(e1);
                 }
             });
@@ -223,10 +244,63 @@ public class SelectSavePath extends DialogWrapper {
         });
     }
 
+    /**
+     * treePathToPackageName
+     *
+     * @param path path
+     * @return String
+     */
+    private String treePathToPackageName(TreePath path) {
+        return ((PsiPackage) ((DefaultMutableTreeNode) path.getLastPathComponent()).getUserObject()).getQualifiedName();
+    }
+
+    /**
+     * treeNodeToTreePath
+     *
+     * @param node node
+     * @return TreePath
+     */
+    public TreePath treeNodeToTreePath(TreeNode node) {
+        List<TreeNode> path = new ArrayList<>();
+        while (node != null) {
+            path.add(0, node); // 将当前节点添加到路径列表的开头
+            node = node.getParent();
+        }
+        return new TreePath(path.toArray(new TreeNode[0]));
+    }
+
+    /**
+     * getProjectBasePackageTreeNode
+     *
+     * @param node node
+     * @return TreeNode
+     */
+    private TreeNode getProjectBasePackageTreeNode(TreeNode node) {
+        // 检查当前节点是否为目标节点
+        int childCount = node.getChildCount();
+        if (childCount > 1) { // 找到第一个有子节点的package视为basePackage
+            return node;
+        } else if (node.getParent() == null && childCount == 0) { // 纯基础java工程，还没有package的情况
+            return node;
+        } else if (childCount == 0 && node.getParent().getChildCount() == 1) { // 整个project都没有二级package
+            return node;
+        } else {
+            // 遍历子节点
+            for (int i = 0; i < childCount; i++) {
+                TreeNode foundNode = getProjectBasePackageTreeNode(node.getChildAt(i));
+                if (foundNode != null) {
+                    return foundNode;
+                }
+            }
+        }
+        // 如果没有找到目标节点，则返回null
+        return null;
+    }
+
     private void refreshData() {
         // 获取选中的表信息（鼠标右键的那张表），并提示未知类型
         TableInfo tableInfo;
-        if(entityMode) {
+        if (entityMode) {
             tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectPsiClass());
         } else {
             tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectDbTable());
@@ -297,7 +371,7 @@ public class SelectSavePath extends DialogWrapper {
         }
         // 保存配置
         TableInfo tableInfo;
-        if(!entityMode) {
+        if (!entityMode) {
             tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectDbTable());
         } else {
             tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectPsiClass());
