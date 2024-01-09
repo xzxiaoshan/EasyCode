@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.util.PatternUtil;
 import com.intellij.util.containers.JBIterable;
 import com.intellij.util.ui.JBUI;
 import com.sjhy.plugin.dict.GlobalDict;
@@ -26,6 +27,7 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -107,7 +109,9 @@ public class MainAction extends AnAction {
                 }
             }
             // 没找到类型，提示用户选择输入类型
-            new Dialog(project, typeName).showAndGet();
+            if(!new Dialog(project, typeName).showAndGet()) {
+                return false;
+            }
         }
         return true;
     }
@@ -146,13 +150,27 @@ public class MainAction extends AnAction {
 
         @Override
         protected void doOKAction() {
-            super.doOKAction();
             String selectedItem = (String) this.comboBox.getSelectedItem();
             if (StringUtils.isEmpty(selectedItem)) {
+                super.doCancelAction();
                 return;
             }
+            super.doOKAction();
+            typeName = typeName.toLowerCase();
+            // matcher1 对应 abc(1)/abc(1) unsigned 这种格式
+            Matcher matcher1 = Pattern.compile("(\\w+)\\(\\d+\\)(.*)").matcher(typeName);
+            // matcher2 对应 abc(3,2)/abc(3,2) unsigned 这种格式
+            Matcher matcher2 = Pattern.compile("(\\w+)\\(\\d+,\\d+\\)(.*)").matcher(typeName);
+            MatchType matchType = MatchType.ORDINARY;
+            if(matcher1.matches()) {
+                matchType = MatchType.REGEX;
+                typeName = matcher1.group(1).concat("(\\(\\d+\\)(.*))?");
+            } else if(matcher2.matches()) {
+                matchType = MatchType.REGEX;
+                typeName = matcher2.group(1).concat("(\\(\\d+,\\d+\\)(.*))?");
+            }
             TypeMapper typeMapper = new TypeMapper();
-            typeMapper.setMatchType(MatchType.ORDINARY);
+            typeMapper.setMatchType(matchType);
             typeMapper.setJavaType(selectedItem);
             typeMapper.setColumnType(typeName);
             CurrGroupUtils.getCurrTypeMapperGroup().getElementList().add(typeMapper);
