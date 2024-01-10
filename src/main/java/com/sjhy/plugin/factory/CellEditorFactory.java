@@ -5,6 +5,7 @@ import com.intellij.ui.components.JBTextField;
 
 import javax.swing.*;
 import javax.swing.table.TableCellEditor;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -54,7 +55,7 @@ public class CellEditorFactory {
         component.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
-
+                // no code
             }
 
             @Override

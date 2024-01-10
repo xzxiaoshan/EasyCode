@@ -4,6 +4,8 @@ import com.sjhy.plugin.enums.ColumnConfigType;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * 列配置信息
  *
@@ -13,7 +15,10 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class ColumnConfig implements AbstractItem<ColumnConfig> {
+public class ColumnConfig implements AbstractItem<ColumnConfig>, Serializable {
+
+    private static final long serialVersionUID = 1905122041950251207L;
+
     /**
      * 标题
      */

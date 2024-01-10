@@ -1,12 +1,14 @@
 package com.sjhy.plugin.dto;
 
 import com.intellij.database.model.DasColumn;
+import com.intellij.database.util.DasUtil;
 import com.intellij.psi.PsiField;
 import com.sjhy.plugin.entity.TypeMapper;
 import com.sjhy.plugin.enums.MatchType;
 import com.sjhy.plugin.tool.CurrGroupUtils;
 import com.sjhy.plugin.tool.DocCommentUtils;
 import com.sjhy.plugin.tool.NameUtils;
+import com.sjhy.plugin.tool.PsiClassGenerateUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -29,6 +31,7 @@ public class ColumnInfoDTO {
         this.name = field.getName();
         this.comment = DocCommentUtils.getComment(field.getDocComment());
         this.type = field.getType().getCanonicalText();
+        this.isPrimaryKey = PsiClassGenerateUtils.isPkField(field);
         this.custom = false;
         this.ext = "{}";
     }
@@ -36,7 +39,8 @@ public class ColumnInfoDTO {
     public ColumnInfoDTO(DasColumn column) {
         this.name = NameUtils.getInstance().getJavaName(column.getName());
         this.comment = column.getComment();
-        this.type = getJavaType(column.getDasType().toString());
+        this.type = getJavaType(column.getDasType().toDataType().toString());
+        this.isPrimaryKey = DasUtil.isPrimary(column);
         this.custom = false;
         this.ext = "{}";
     }
@@ -69,6 +73,10 @@ public class ColumnInfoDTO {
      * 全类型
      */
     private String type;
+    /**
+     * 是否主键
+     */
+    private Boolean isPrimaryKey;
     /**
      * 标记是否为自定义附加列
      */

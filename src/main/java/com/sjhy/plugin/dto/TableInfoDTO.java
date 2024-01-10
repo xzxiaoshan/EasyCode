@@ -213,8 +213,10 @@ public class TableInfoDTO {
             columnInfo.setCustom(false);
             tableInfo.getFullColumn().add(columnInfo);
             if (PsiClassGenerateUtils.isPkField(field)) {
+                columnInfo.setIsPrimaryKey(true);
                 tableInfo.getPkColumn().add(columnInfo);
             } else {
+                columnInfo.setIsPrimaryKey(false);
                 tableInfo.getOtherColumn().add(columnInfo);
             }
         }
@@ -254,8 +256,10 @@ public class TableInfoDTO {
             columnInfo.setExt(JSON.parse(dto.getExt(), HashMap.class));
             tableInfo.getFullColumn().add(columnInfo);
             if (columnInfo.getObj() != null && DasUtil.isPrimary(columnInfo.getObj())) {
+                columnInfo.setIsPrimaryKey(true);
                 tableInfo.getPkColumn().add(columnInfo);
             } else {
+                columnInfo.setIsPrimaryKey(false);
                 tableInfo.getOtherColumn().add(columnInfo);
             }
         }
@@ -280,6 +284,7 @@ public class TableInfoDTO {
             columnInfoDTO.setExt(JSON.toJson(columnInfo.getExt()));
             columnInfoDTO.setCustom(columnInfo.getCustom());
             columnInfoDTO.setComment(columnInfo.getComment());
+            columnInfoDTO.setIsPrimaryKey(columnInfo.getIsPrimaryKey());
             dto.getFullColumn().add(columnInfoDTO);
         }
         return dto;

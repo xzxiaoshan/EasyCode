@@ -27,7 +27,7 @@ public class DocCommentUtils {
             return null;
         }
         return Arrays.stream(docComment.getDescriptionElements())
-                .filter(o -> o instanceof PsiDocToken)
+                .filter(PsiDocToken.class::isInstance)
                 .map(PsiElement::getText)
                 .findFirst()
                 .map(String::trim)

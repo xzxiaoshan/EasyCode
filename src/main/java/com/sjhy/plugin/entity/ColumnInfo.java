@@ -33,6 +33,10 @@ public class ColumnInfo {
      */
     private String type;
     /**
+     * 是否主键
+     */
+    private Boolean isPrimaryKey;
+    /**
      * 短类型
      */
     private String shortType;
