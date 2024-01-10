@@ -50,6 +50,11 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
      */
     public static final String[] DEFAULT_TITLE_ARRAY = new String[]{TITLE_NAME, TITLE_TYPE, TITLE_COMMENT, TITLE_PK};
 
+    /**
+     * 所有列的ColumnConfig集合
+     */
+    public List<ColumnConfig> allColumnConfigList = new ArrayList<>();
+
     private TableInfo tableInfo;
 
     public ConfigTableModel(TableInfo tableInfo) {
@@ -59,13 +64,34 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
     }
 
     private void initColumn() {
-        addColumn(TITLE_NAME);
-        addColumn(TITLE_TYPE);
-        addColumn(TITLE_COMMENT);
-        addColumn(TITLE_PK);
-        for (ColumnConfig columnConfig : CurrGroupUtils.getCurrColumnConfigGroup().getElementList()) {
-            addColumn(columnConfig.getTitle());
-        }
+        // 默认列
+        this.allColumnConfigList.add(new ColumnConfig(TITLE_NAME, ColumnConfigType.TEXT));
+        this.allColumnConfigList.add(new ColumnConfig(TITLE_TYPE, ColumnConfigType.SELECT));
+        this.allColumnConfigList.add(new ColumnConfig(TITLE_COMMENT, ColumnConfigType.TEXT));
+        this.allColumnConfigList.add(new ColumnConfig(TITLE_PK, ColumnConfigType.BOOLEAN));
+        // 自定义列
+        allColumnConfigList.addAll(CurrGroupUtils.getCurrColumnConfigGroup().getElementList());
+        // 所有列初始化
+        allColumnConfigList.forEach(item -> addColumn(item.getTitle()));
+    }
+
+    /**
+     * 获取所有列的ColumnConfig
+     *
+     * @return List
+     */
+    public List<ColumnConfig> getAllColumnConfig() {
+        return this.allColumnConfigList;
+    }
+
+    /**
+     * 获取指定列的ColumnConfig
+     *
+     * @param columnIndex columnIndex
+     * @return ColumnConfig
+     */
+    public ColumnConfig getColumnConfig(int columnIndex) {
+        return this.allColumnConfigList.get(columnIndex);
     }
 
     private void initTableData() {
@@ -198,7 +224,7 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
         ColumnInfo columnInfo = this.tableInfo.getFullColumn().get(row);
         // 非自定义列，列名不允许修改，自动映射的Java类型也不允许修改
         // 考虑：尽量不要用户在这里做操作；并且对于一个模板来说，还是会规范好某种数据库类型固定到Java的类型为好，如果用户确实需要自定义，统一设置中也是可以修改的
-        if(column == 0 || column == 1) {// 列名称和数据类型
+        if (column == 0 || column == 1) {// 列名称和数据类型
             if (columnInfo != null && Boolean.FALSE.equals(columnInfo.getCustom())) {
                 return false;
             }

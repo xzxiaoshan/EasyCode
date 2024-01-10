@@ -20,10 +20,14 @@ import com.sjhy.plugin.ui.base.ConfigTableModel;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import java.awt.*;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -67,6 +71,7 @@ public class ConfigTableDialog extends DialogWrapper {
         TableColumn nameColumn = table.getColumn(ConfigTableModel.TITLE_NAME);
         nameColumn.setCellEditor(CellEditorFactory.createTextFieldEditor());
         nameColumn.setMinWidth(100);
+
         totalWidth+=100;
         TableColumn typeColumn = table.getColumn(ConfigTableModel.TITLE_TYPE);
         typeColumn.setCellRenderer(new ComboBoxTableRenderer<>(GlobalDict.DEFAULT_JAVA_TYPE_LIST));
@@ -136,25 +141,14 @@ public class ConfigTableDialog extends DialogWrapper {
         // 设置表头单元格渲染器
         header.setDefaultRenderer(new DefaultTableCellRenderer() {
 
-            /**
-             * columnConfigMap
-             */
-            private Map<String, ColumnConfig> columnConfigMap;
 
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                            boolean isSelected, boolean hasFocus, int row, int column) {
-                if(columnConfigMap == null) {
-                    columnConfigMap = new HashMap<>();
-                    for(ColumnConfig item: CurrGroupUtils.getCurrColumnConfigGroup().getElementList()) {
-                        columnConfigMap.put(item.getTitle(), item);
-                    }
-                }
                 // 调用父类方法初始化渲染器组件
                 JLabel renderer = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                String titleName = value.toString();
-                ColumnConfig columnConfig = columnConfigMap.get(titleName);
-                if(ConfigTableModel.TITLE_PK.equals(titleName) || columnConfig != null && ColumnConfigType.BOOLEAN.equals(columnConfig.getType())) {
+                ColumnConfig columnConfig = ((ConfigTableModel)table.getModel()).getColumnConfig(column);
+                if(columnConfig != null && ColumnConfigType.BOOLEAN.equals(columnConfig.getType())) {
                     // BOOLEAN类型的类，设置文本对齐方式为居中
                     renderer.setHorizontalAlignment(SwingConstants.CENTER);
                 } else {
@@ -164,7 +158,11 @@ public class ConfigTableDialog extends DialogWrapper {
             }
         });
 
-        // 确保所有列都刷新以应用新的渲染器
+        TableConfigHeaderMouseAdapter tableConfigHeaderMouseAdapter = new TableConfigHeaderMouseAdapter(table);
+        header.addMouseListener(tableConfigHeaderMouseAdapter);
+        header.addMouseMotionListener(tableConfigHeaderMouseAdapter);
+
+        // 确保所有列都刷新以应用新地渲染器
         table.getTableHeader().repaint();
     }
 

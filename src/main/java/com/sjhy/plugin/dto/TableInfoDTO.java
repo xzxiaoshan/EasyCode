@@ -97,7 +97,7 @@ public class TableInfoDTO {
         Map<String, String> nameMap = new HashMap<>(oldSequenceColumn.size());
         for (int i = 0; i < oldSequenceColumn.size(); i++) {
             ColumnInfoDTO columnInfo = oldSequenceColumn.get(i);
-            if (columnInfo.getCustom()) {
+            if (Boolean.TRUE.equals(columnInfo.getCustom())) {
                 // 如果原本是自定义列，现在变成了数据库列，则忽略调原本的自定义列
                 if (allNewColumnNames.contains(columnInfo.getName())) {
                     continue;
