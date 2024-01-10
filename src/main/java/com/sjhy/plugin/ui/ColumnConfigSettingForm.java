@@ -10,18 +10,28 @@ import com.sjhy.plugin.entity.ColumnConfigGroup;
 import com.sjhy.plugin.enums.ColumnConfigType;
 import com.sjhy.plugin.factory.CellEditorFactory;
 import com.sjhy.plugin.tool.CloneUtils;
+import com.sjhy.plugin.ui.base.ConfigTableModel;
 import com.sjhy.plugin.ui.component.GroupNameComponent;
 import com.sjhy.plugin.ui.component.TableComponent;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+import javax.swing.text.PlainDocument;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -60,7 +70,9 @@ public class ColumnConfigSettingForm implements Configurable, BaseSettings {
         TableComponent.Column<ColumnConfig> typeColumn = new TableComponent.Column<>("type", item -> item.getType().name(), (entity, val) -> entity.setType(ColumnConfigType.valueOf(val)), typeEditor, typeRenderer);
         // 第二列标题
         TableCellEditor titleEditor = CellEditorFactory.createTextFieldEditor();
+        this.restrictedInputContent((DefaultCellEditor)titleEditor);
         TableComponent.Column<ColumnConfig> titleColumn = new TableComponent.Column<>("title", ColumnConfig::getTitle, ColumnConfig::setTitle, titleEditor, null);
+
         // 第三列选项
         TableCellEditor selectValueEditor = CellEditorFactory.createTextFieldEditor();
         TableComponent.Column<ColumnConfig> selectValueColumn = new TableComponent.Column<>("selectValue", ColumnConfig::getSelectValue, ColumnConfig::setSelectValue, selectValueEditor, null);
@@ -70,6 +82,46 @@ public class ColumnConfigSettingForm implements Configurable, BaseSettings {
         this.tableComponent = new TableComponent<>(columns, this.currColumnConfigGroup.getElementList(), ColumnConfig.class);
         this.mainPanel.add(this.tableComponent.createPanel(), BorderLayout.CENTER);
     }
+
+    /**
+     * 限制输入内容
+     */
+    private void restrictedInputContent(DefaultCellEditor cellEditor){
+        // 通过监听器限制不能输入内置的默认列
+        JTextField textField = (JTextField) cellEditor.getComponent();
+        ((PlainDocument)textField.getDocument()).setDocumentFilter(new DocumentFilter(){
+            private final String[] forbiddenValues = ConfigTableModel.DEFAULT_TITLE_ARRAY;
+            @Override
+            public void insertString(DocumentFilter.FilterBypass fb, int offset, String text, AttributeSet attrs) throws BadLocationException {
+                if (containsForbiddenWords(text) || containsForbiddenWords(fb.getDocument().getText(0, fb.getDocument().getLength()))) {
+                    Toolkit.getDefaultToolkit().beep(); // 发出错误提示声音
+                } else {
+                    super.insertString(fb, offset, text, attrs);
+                }
+            }
+            @Override
+            public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
+                String currentText = fb.getDocument().getText(0, fb.getDocument().getLength());
+                String newText = currentText.substring(0, offset) + text + currentText.substring(offset + length);
+                if (containsForbiddenWords(newText)) {
+                    Toolkit.getDefaultToolkit().beep(); // 发出错误提示声音
+                } else {
+                    super.replace(fb, offset, length, text, attrs);
+                }
+            }
+
+            private boolean containsForbiddenWords(String input) {
+                for (String word : forbiddenValues) {
+                    if (input.equals(word)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+    }
+
+
 
     private void initGroupName() {
 
