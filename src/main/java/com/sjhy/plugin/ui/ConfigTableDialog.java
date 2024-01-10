@@ -9,6 +9,7 @@ import com.intellij.ui.table.JBTable;
 import com.sjhy.plugin.dict.GlobalDict;
 import com.sjhy.plugin.entity.ColumnConfig;
 import com.sjhy.plugin.entity.TableInfo;
+import com.sjhy.plugin.enums.ColumnConfigType;
 import com.sjhy.plugin.factory.CellEditorFactory;
 import com.sjhy.plugin.service.TableInfoSettingsService;
 import com.sjhy.plugin.tool.CacheDataUtils;
@@ -19,10 +20,14 @@ import com.sjhy.plugin.ui.base.ConfigTableModel;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 表配置窗口
@@ -54,23 +59,31 @@ public class ConfigTableDialog extends DialogWrapper {
         ConfigTableModel model = new ConfigTableModel(this.tableInfo);
         JBTable table = new JBTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        this.rendererTableHeader(table);
 
         int totalWidth = 0;
 
         // 配置列编辑器
-        TableColumn nameColumn = table.getColumn("name");
+        TableColumn nameColumn = table.getColumn(ConfigTableModel.TITLE_NAME);
         nameColumn.setCellEditor(CellEditorFactory.createTextFieldEditor());
         nameColumn.setMinWidth(100);
         totalWidth+=100;
-        TableColumn typeColumn = table.getColumn("type");
+        TableColumn typeColumn = table.getColumn(ConfigTableModel.TITLE_TYPE);
         typeColumn.setCellRenderer(new ComboBoxTableRenderer<>(GlobalDict.DEFAULT_JAVA_TYPE_LIST));
         typeColumn.setCellEditor(CellEditorFactory.createComboBoxEditor(true, GlobalDict.DEFAULT_JAVA_TYPE_LIST));
-        typeColumn.setMinWidth(120);
-        totalWidth+=120;
-        TableColumn commentColumn = table.getColumn("comment");
+        typeColumn.setMinWidth(163);
+        totalWidth+=163;
+        TableColumn commentColumn = table.getColumn(ConfigTableModel.TITLE_COMMENT);
         commentColumn.setCellEditor(CellEditorFactory.createTextFieldEditor());
         commentColumn.setMinWidth(140);
         totalWidth+=140;
+        TableColumn pkColumn = table.getColumn(ConfigTableModel.TITLE_PK);
+        pkColumn.setCellRenderer(new BooleanTableCellRenderer());
+        pkColumn.setCellEditor(new BooleanTableCellEditor());
+        pkColumn.setMinWidth(50);
+        pkColumn.setMaxWidth(50);
+        pkColumn.setResizable(false);
+        totalWidth+=50;
         // 其他附加列
         for (ColumnConfig columnConfig : CurrGroupUtils.getCurrColumnConfigGroup().getElementList()) {
             TableColumn column = table.getColumn(columnConfig.getTitle());
@@ -109,6 +122,50 @@ public class ConfigTableDialog extends DialogWrapper {
         final ToolbarDecorator decorator = ToolbarDecorator.createDecorator(table);
         this.mainPanel.add(decorator.createPanel(), BorderLayout.CENTER);
         this.mainPanel.setMinimumSize(new Dimension(totalWidth, Math.max(300, totalWidth / 3)));
+    }
+
+    /**
+     * 渲染表头
+     *
+     * @param table table
+     */
+    private void rendererTableHeader(JBTable table) {
+        // 获取JTable的表头组件
+        JTableHeader header = table.getTableHeader();
+
+        // 设置表头单元格渲染器
+        header.setDefaultRenderer(new DefaultTableCellRenderer() {
+
+            /**
+             * columnConfigMap
+             */
+            private Map<String, ColumnConfig> columnConfigMap;
+
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                           boolean isSelected, boolean hasFocus, int row, int column) {
+                if(columnConfigMap == null) {
+                    columnConfigMap = new HashMap<>();
+                    for(ColumnConfig item: CurrGroupUtils.getCurrColumnConfigGroup().getElementList()) {
+                        columnConfigMap.put(item.getTitle(), item);
+                    }
+                }
+                // 调用父类方法初始化渲染器组件
+                JLabel renderer = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                String titleName = value.toString();
+                ColumnConfig columnConfig = columnConfigMap.get(titleName);
+                if(ConfigTableModel.TITLE_PK.equals(titleName) || columnConfig != null && ColumnConfigType.BOOLEAN.equals(columnConfig.getType())) {
+                    // BOOLEAN类型的类，设置文本对齐方式为居中
+                    renderer.setHorizontalAlignment(SwingConstants.CENTER);
+                } else {
+                    renderer.setHorizontalAlignment(SwingConstants.LEFT);
+                }
+                return renderer;
+            }
+        });
+
+        // 确保所有列都刷新以应用新的渲染器
+        table.getTableHeader().repaint();
     }
 
     @Override
