@@ -5,11 +5,17 @@ import com.sjhy.plugin.entity.ColumnConfig;
 import com.sjhy.plugin.entity.ColumnInfo;
 import com.sjhy.plugin.entity.TableInfo;
 import com.sjhy.plugin.enums.ColumnConfigType;
+import com.sjhy.plugin.tool.CollectionUtil;
 import com.sjhy.plugin.tool.CurrGroupUtils;
 import com.sjhy.plugin.tool.StringUtils;
 
 import javax.swing.table.DefaultTableModel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -18,6 +24,31 @@ import java.util.stream.Collectors;
  * @date 2021/08/14 13:41
  */
 public class ConfigTableModel extends DefaultTableModel implements EditableModel {
+
+    /**
+     * 名称的Title
+     */
+    public static final String TITLE_NAME = "name";
+
+    /**
+     * 数据类型的Title
+     */
+    public static final String TITLE_TYPE = "type";
+
+    /**
+     * 备注的Title
+     */
+    public static final String TITLE_COMMENT = "comment";
+
+    /**
+     * 主键的Title
+     */
+    public static final String TITLE_PK = "PK";
+
+    /**
+     * 默认列
+     */
+    public static final String[] DEFAULT_TITLE_ARRAY = new String[]{TITLE_NAME, TITLE_TYPE, TITLE_COMMENT, TITLE_PK};
 
     private TableInfo tableInfo;
 
@@ -28,9 +59,10 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
     }
 
     private void initColumn() {
-        addColumn("name");
-        addColumn("type");
-        addColumn("comment");
+        addColumn(TITLE_NAME);
+        addColumn(TITLE_TYPE);
+        addColumn(TITLE_COMMENT);
+        addColumn(TITLE_PK);
         for (ColumnConfig columnConfig : CurrGroupUtils.getCurrColumnConfigGroup().getElementList()) {
             addColumn(columnConfig.getTitle());
         }
@@ -48,6 +80,7 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
             values.add(columnInfo.getName());
             values.add(columnInfo.getType());
             values.add(columnInfo.getComment());
+            values.add(columnInfo.getIsPrimaryKey());
             Map<String, Object> ext = columnInfo.getExt();
             if (ext == null) {
                 ext = Collections.emptyMap();
@@ -82,6 +115,7 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
         columnInfo.setComment("");
         columnInfo.setShortType("String");
         columnInfo.setType("java.lang.String");
+        columnInfo.setIsPrimaryKey(false);
         this.tableInfo.getFullColumn().add(columnInfo);
         // 刷新表数据
         this.initTableData();
@@ -91,10 +125,6 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
     public void setValueAt(Object value, int row, int column) {
         ColumnInfo columnInfo = this.tableInfo.getFullColumn().get(row);
         if (columnInfo == null) {
-            return;
-        }
-        // 非自定义数据不允许修改
-        if (!columnInfo.getCustom() && column <= 2) {
             return;
         }
         switch (column) {
@@ -123,8 +153,11 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
             case 2:
                 columnInfo.setComment((String) value);
                 break;
+            case 3:
+                columnInfo.setIsPrimaryKey((Boolean) value);
+                break;
             default:
-                ColumnConfig columnConfig = CurrGroupUtils.getCurrColumnConfigGroup().getElementList().get(column - 3);
+                ColumnConfig columnConfig = CurrGroupUtils.getCurrColumnConfigGroup().getElementList().get(column - DEFAULT_TITLE_ARRAY.length);
                 if (columnInfo.getExt() == null) {
                     columnInfo.setExt(new HashMap<>(16));
                 }
@@ -141,7 +174,7 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
             return;
         }
         // 非自定义列不允许删除
-        if (!columnInfo.getCustom()) {
+        if (Boolean.FALSE.equals(columnInfo.getCustom())) {
             return;
         }
         this.tableInfo.getFullColumn().remove(row);
@@ -159,4 +192,21 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
     public boolean canExchangeRows(int oldIndex, int newIndex) {
         return false;
     }
+
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        ColumnInfo columnInfo = this.tableInfo.getFullColumn().get(row);
+        // 非自定义列，列名不允许修改，自动映射的Java类型也不允许修改
+        // 考虑：尽量不要用户在这里做操作；并且对于一个模板来说，还是会规范好某种数据库类型固定到Java的类型为好，如果用户确实需要自定义，统一设置中也是可以修改的
+        if(column == 0 || column == 1) {// 列名称和数据类型
+            if (columnInfo != null && Boolean.FALSE.equals(columnInfo.getCustom())) {
+                return false;
+            }
+        } else if (column == 3 && !CollectionUtil.isEmpty(this.tableInfo.getPkColumn())) { // 主键
+            // 如果从数据库读取的所有列没有一个主键，则PK列可以编辑，需要用户勾选主键列，否则使用数据库的主键且不可以编辑
+            return false;
+        }
+        return super.isCellEditable(row, column);
+    }
+
 }
