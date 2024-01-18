@@ -64,21 +64,30 @@ public class TemplateSelectComponent {
         this.allCheckbox.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (checkBoxList == null) {
-                    return;
-                }
-                for (JBCheckBox checkBox : checkBoxList) {
-                    checkBox.setSelected(allCheckbox.isSelected());
-                }
+                handleSelectAllCheckBox();
             }
         });
         this.mainPanel.add(topPanel, BorderLayout.NORTH);
         this.templatePanel = new JPanel(new GridLayout(-1, 3));
         this.mainPanel.add(templatePanel, BorderLayout.CENTER);
+        // 设置 "全选" 复选框默认选中
+        allCheckbox.setSelected(true);
+        handleSelectAllCheckBox();
+    }
+
+    /**
+     * handleSelectAllCheckBox
+     */
+    private void handleSelectAllCheckBox() {
+        if (checkBoxList == null) {
+            return;
+        }
+        for (JBCheckBox checkBox : checkBoxList) {
+            checkBox.setSelected(allCheckbox.isSelected());
+        }
     }
 
     public void refreshTemplatePanel(String groupName) {
-        this.allCheckbox.setSelected(false);
         this.templatePanel.removeAll();
         this.checkBoxList = new ArrayList<>();
         TemplateGroup templateGroup = SettingsStorageService.getSettingsStorage().getTemplateGroupMap().get(groupName);
@@ -90,6 +99,8 @@ public class TemplateSelectComponent {
             this.checkBoxList.add(checkBox);
             this.templatePanel.add(checkBox);
         }
+        this.allCheckbox.setSelected(true);
+        handleSelectAllCheckBox();
         this.mainPanel.updateUI();
     }
 
