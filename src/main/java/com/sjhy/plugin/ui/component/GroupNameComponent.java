@@ -30,7 +30,7 @@ import java.util.function.Consumer;
  */
 public class GroupNameComponent<E extends AbstractItem<E>, T extends AbstractGroup<T, E>> {
 
-    private Consumer<T> switchGroupConsumer;
+    private final Consumer<T> switchGroupConsumer;
 
     /**
      * 当前分组

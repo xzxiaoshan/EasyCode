@@ -13,7 +13,7 @@ import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiModifier;
 import com.sjhy.plugin.tool.CacheDataUtils;
-import com.sjhy.plugin.ui.SelectSavePath;
+import com.sjhy.plugin.ui.MainGenerate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -60,7 +60,7 @@ public class EasyCodeEntityAction extends AnAction {
         // 缓存选中值
         cacheDataUtils.setSelectPsiClass(psiClassList.get(0));
         cacheDataUtils.setPsiClassList(psiClassList);
-        new SelectSavePath(project, true).show();
+        new MainGenerate(project, true).show();
     }
 
     /**

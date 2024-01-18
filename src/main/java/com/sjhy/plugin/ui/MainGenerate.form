@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.sjhy.plugin.ui.SelectSavePath">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.sjhy.plugin.ui.MainGenerate">
   <grid id="cbd77" binding="contentPane" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
     <margin top="10" left="10" bottom="10" right="10"/>
     <constraints>
-      <xy x="48" y="54" width="436" height="336"/>
+      <xy x="48" y="54" width="636" height="419"/>
     </constraints>
     <properties/>
     <border type="none"/>
     <children>
-      <grid id="e3588" layout-manager="GridLayoutManager" row-count="9" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+      <grid id="e3588" layout-manager="GridLayoutManager" row-count="8" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
         <margin top="0" left="0" bottom="0" right="0"/>
         <constraints>
           <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
@@ -74,27 +74,6 @@
               <text resource-bundle="string" key="label.choose"/>
             </properties>
           </component>
-          <grid id="7831c" binding="templatePanel" layout-manager="BorderLayout" hgap="0" vgap="0">
-            <constraints>
-              <grid row="4" column="1" row-span="5" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties/>
-            <border type="none"/>
-            <children/>
-          </grid>
-          <component id="91ae2" class="javax.swing.JLabel">
-            <constraints>
-              <grid row="4" column="0" row-span="5" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-            </constraints>
-            <properties>
-              <text resource-bundle="string" key="label.template"/>
-            </properties>
-          </component>
-          <vspacer id="98aa7">
-            <constraints>
-              <grid row="8" column="2" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
-            </constraints>
-          </vspacer>
           <component id="caddc" class="javax.swing.JLabel">
             <constraints>
               <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -121,42 +100,81 @@
               <text resource-bundle="string" key="label.module"/>
             </properties>
           </component>
-          <component id="5e5a1" class="javax.swing.JCheckBox" binding="unifiedConfigCheckBox">
+          <component id="18e5f" class="javax.swing.JLabel">
             <constraints>
-              <grid row="4" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text resource-bundle="string" key="label.unified.config"/>
-              <toolTipText value="在多表生成时，每张表会有自己保存的配置信息。&lt;br&gt;勾选统一配置表示所有表都使用当前的配置信息进行生成。&lt;br&gt;否则使用自身保存的配置信息生成代码。"/>
+              <labelFor value="76436"/>
+              <text resource-bundle="string" key="label.template"/>
             </properties>
           </component>
-          <component id="af94e" class="javax.swing.JCheckBox" binding="titleSureCheckBox">
+          <component id="2b16" class="com.intellij.openapi.ui.ComboBox" binding="templateGroupComboBox">
             <constraints>
-              <grid row="5" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
             </constraints>
             <properties>
-              <text value="弹框选是"/>
-              <toolTipText value="后续弹出的所有代码覆盖弹框全部选是"/>
+              <swingPopup value="false"/>
             </properties>
           </component>
-          <component id="53e7" class="javax.swing.JCheckBox" binding="reFormatCheckBox">
+          <grid id="7831c" binding="templatePanel" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints>
-              <grid row="7" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="5" column="1" row-span="1" col-span="2" vsize-policy="1" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <text value="格式化代码"/>
-              <toolTipText value="对生成完毕的代码进行格式化"/>
-            </properties>
-          </component>
-          <component id="846f2" class="javax.swing.JCheckBox" binding="titleRefuseCheckBox">
+            <properties/>
+            <border type="none"/>
+            <children/>
+          </grid>
+          <grid id="cd529" binding="tableConfigPane" layout-manager="BorderLayout" hgap="0" vgap="0">
             <constraints>
-              <grid row="6" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+              <grid row="6" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
             </constraints>
-            <properties>
-              <text value="弹框选否"/>
-              <toolTipText value="后续弹出的所有代码覆盖弹框全部选否"/>
-            </properties>
-          </component>
+            <properties/>
+            <border type="none"/>
+            <children/>
+          </grid>
+          <grid id="f7f93" layout-manager="GridLayoutManager" row-count="1" column-count="4" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="7" column="0" row-span="1" col-span="3" vsize-policy="3" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="af94e" class="javax.swing.JCheckBox" binding="titleSureCheckBox">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="覆盖代码"/>
+                  <toolTipText value="后续弹出的所有代码覆盖弹框全部选是"/>
+                </properties>
+              </component>
+              <component id="846f2" class="javax.swing.JCheckBox" binding="titleRefuseCheckBox">
+                <constraints>
+                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="不覆盖代码"/>
+                  <toolTipText value="后续弹出的所有代码覆盖弹框全部选否"/>
+                </properties>
+              </component>
+              <component id="53e7" class="javax.swing.JCheckBox" binding="reFormatCheckBox">
+                <constraints>
+                  <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="格式化代码"/>
+                  <toolTipText value="对生成完毕的代码进行格式化"/>
+                </properties>
+              </component>
+              <hspacer id="ba357">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+              </hspacer>
+            </children>
+          </grid>
         </children>
       </grid>
     </children>

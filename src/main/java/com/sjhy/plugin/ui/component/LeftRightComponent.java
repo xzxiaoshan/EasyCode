@@ -23,19 +23,19 @@ public class LeftRightComponent {
     /**
      * 左边面板
      */
-    private JPanel leftPanel;
+    private final JPanel leftPanel;
     /**
      * 右边面板
      */
-    private JPanel rightPanel;
+    private final JPanel rightPanel;
     /**
      * 分割比例
      */
-    private float proportion;
+    private final float proportion;
     /**
      * 预设值窗口大小
      */
-    private Dimension preferredSize;
+    private final Dimension preferredSize;
 
     public LeftRightComponent(JPanel leftPanel, JPanel rightPanel) {
         this(leftPanel, rightPanel, 0.2F, JBUI.size(400, 300));

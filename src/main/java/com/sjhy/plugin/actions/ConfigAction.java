@@ -1,11 +1,19 @@
 package com.sjhy.plugin.actions;
 
+import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
+import com.sjhy.plugin.entity.TableInfo;
+import com.sjhy.plugin.service.TableInfoSettingsService;
+import com.sjhy.plugin.tool.CacheDataUtils;
 import com.sjhy.plugin.ui.ConfigTableDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 表配置菜单
@@ -35,6 +43,11 @@ public class ConfigAction extends AnAction {
         if (project == null) {
             return;
         }
-        new ConfigTableDialog().show();
+        // 选中的表
+        List<TableInfo> selectedTables = CacheDataUtils.getInstance().getDbTableList().stream()
+                .map(dbTable -> TableInfoSettingsService.getInstance().getTableInfo(dbTable)).collect(Collectors.toList());
+        if(!selectedTables.isEmpty()) {
+            new ConfigTableDialog(project, selectedTables).show();
+        }
     }
 }

@@ -235,4 +235,7 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
         return super.isCellEditable(row, column);
     }
 
+    public TableInfo getTableInfo() {
+        return tableInfo;
+    }
 }

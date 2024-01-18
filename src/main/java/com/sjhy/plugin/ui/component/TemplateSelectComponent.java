@@ -25,13 +25,12 @@ import java.util.stream.Collectors;
  * @date 2021/08/16 16:18
  */
 public class TemplateSelectComponent {
-    @Getter
-    private JPanel mainPanel;
 
     /**
-     * 分组
+     * mainPanel
      */
-    private ComboBox<String> groupComboBox;
+    @Getter
+    private JPanel mainPanel;
 
     /**
      * 选中所有复选框
@@ -48,25 +47,19 @@ public class TemplateSelectComponent {
      */
     private JPanel templatePanel;
 
-    public TemplateSelectComponent() {
+    /**
+     * 模板组下拉选择框
+     */
+    private final ComboBox<String> groupComboBox;
+
+    public TemplateSelectComponent(ComboBox<String> groupComboBox) {
+        this.groupComboBox = groupComboBox;
         this.init();
     }
 
     private void init() {
         this.mainPanel = new JPanel(new BorderLayout());
         JPanel topPanel = new JPanel(new BorderLayout());
-        this.groupComboBox = new ComboBox<>();
-        this.groupComboBox.setSwingPopup(false);
-        this.groupComboBox.addActionListener(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String groupName = (String) groupComboBox.getSelectedItem();
-                if (StringUtils.isEmpty(groupName)) {
-                    return;
-                }
-                refreshTemplatePanel(groupName);
-            }
-        });
         this.allCheckbox = new JBCheckBox("All");
         this.allCheckbox.addActionListener(new AbstractAction() {
             @Override
@@ -79,26 +72,19 @@ public class TemplateSelectComponent {
                 }
             }
         });
-        topPanel.add(this.groupComboBox, BorderLayout.WEST);
-        topPanel.add(this.allCheckbox, BorderLayout.EAST);
         this.mainPanel.add(topPanel, BorderLayout.NORTH);
-        this.templatePanel = new JPanel(new GridLayout(-1, 2));
+        this.templatePanel = new JPanel(new GridLayout(-1, 3));
         this.mainPanel.add(templatePanel, BorderLayout.CENTER);
-        this.refreshData();
     }
 
-    private void refreshData() {
-        this.groupComboBox.removeAllItems();
-        for (String groupName : SettingsStorageService.getSettingsStorage().getTemplateGroupMap().keySet()) {
-            this.groupComboBox.addItem(groupName);
-        }
-    }
-
-    private void refreshTemplatePanel(String groupName) {
+    public void refreshTemplatePanel(String groupName) {
         this.allCheckbox.setSelected(false);
         this.templatePanel.removeAll();
         this.checkBoxList = new ArrayList<>();
         TemplateGroup templateGroup = SettingsStorageService.getSettingsStorage().getTemplateGroupMap().get(groupName);
+        // 添加“全选”
+        this.checkBoxList.add(allCheckbox);
+        this.templatePanel.add(allCheckbox);
         for (Template template : templateGroup.getElementList()) {
             JBCheckBox checkBox = new JBCheckBox(template.getName());
             this.checkBoxList.add(checkBox);

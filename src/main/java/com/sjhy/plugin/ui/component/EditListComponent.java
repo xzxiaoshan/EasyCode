@@ -33,17 +33,17 @@ public class EditListComponent<E extends AbstractEditorItem<E>> {
     @Getter
     private JPanel mainPanel;
 
-    private Consumer<E> switchItemFun;
+    private final Consumer<E> switchItemFun;
     /**
      * 当前选中项
      */
     private String currentItem;
 
-    private String label;
+    private final String label;
 
     private JBList<String> jbList;
 
-    private Class<E> cls;
+    private final Class<E> cls;
 
     /**
      * 分组Map

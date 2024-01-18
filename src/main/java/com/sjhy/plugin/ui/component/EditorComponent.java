@@ -46,7 +46,7 @@ public class EditorComponent<T extends AbstractEditorItem> {
     /**
      * 描述信息
      */
-    private String remark;
+    private final String remark;
 
     /**
      * 编辑器组件

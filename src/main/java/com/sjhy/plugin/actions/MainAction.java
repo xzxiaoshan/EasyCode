@@ -9,7 +9,6 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.util.PatternUtil;
 import com.intellij.util.containers.JBIterable;
 import com.intellij.util.ui.JBUI;
 import com.sjhy.plugin.dict.GlobalDict;
@@ -18,7 +17,7 @@ import com.sjhy.plugin.enums.MatchType;
 import com.sjhy.plugin.tool.CacheDataUtils;
 import com.sjhy.plugin.tool.CurrGroupUtils;
 import com.sjhy.plugin.tool.StringUtils;
-import com.sjhy.plugin.ui.SelectSavePath;
+import com.sjhy.plugin.ui.MainGenerate;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,7 +65,7 @@ public class MainAction extends AnAction {
             return;
         }
         //开始处理
-        new SelectSavePath(event.getProject()).show();
+        new MainGenerate(event.getProject()).show();
     }
 
 

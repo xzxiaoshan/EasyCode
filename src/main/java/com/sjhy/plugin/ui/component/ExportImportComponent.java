@@ -38,20 +38,20 @@ public class ExportImportComponent {
     /**
      * 导出按钮
      */
-    private JButton exportBtn;
+    private final JButton exportBtn;
     /**
      * 导入按钮
      */
-    private JButton importBtn;
+    private final JButton importBtn;
     /**
      * 导出导入服务
      */
-    private ExportImportSettingsService service;
+    private final ExportImportSettingsService service;
 
     /**
      * 导入成功回调
      */
-    private Runnable callback;
+    private final Runnable callback;
 
     public ExportImportComponent(JButton exportBtn, JButton importBtn, ExportImportSettingsService service, Runnable callback) {
         this.exportBtn = exportBtn;

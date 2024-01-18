@@ -6,6 +6,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -25,6 +26,7 @@ import com.sjhy.plugin.tool.CacheDataUtils;
 import com.sjhy.plugin.tool.ModuleUtils;
 import com.sjhy.plugin.tool.ProjectUtils;
 import com.sjhy.plugin.tool.StringUtils;
+import com.sjhy.plugin.ui.component.TableConfigJBTabs;
 import com.sjhy.plugin.ui.component.TemplateSelectComponent;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,23 +36,28 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 选择保存路径
  *
  * @author makejava
  * @version 1.0.0
+ * @date 2024-01-18 13:11:37
  * @since 2018/07/17 13:10
  */
-public class SelectSavePath extends DialogWrapper {
+public class MainGenerate extends DialogWrapper {
     /**
      * 主面板
      */
@@ -80,13 +87,13 @@ public class SelectSavePath extends DialogWrapper {
      */
     private JButton pathChooseButton;
     /**
+     * 模板选择下拉框
+     */
+    private ComboBox<String> templateGroupComboBox;
+    /**
      * 模板面板
      */
     private JPanel templatePanel;
-    /**
-     * 统一配置复选框
-     */
-    private JCheckBox unifiedConfigCheckBox;
     /**
      * 弹框选是复选框
      */
@@ -100,30 +107,34 @@ public class SelectSavePath extends DialogWrapper {
      */
     private JCheckBox titleRefuseCheckBox;
     /**
+     * 表配置
+     */
+    private JPanel tableConfigPane;
+    /**
      * 数据缓存工具类
      */
-    private CacheDataUtils cacheDataUtils = CacheDataUtils.getInstance();
+    private final CacheDataUtils cacheDataUtils = CacheDataUtils.getInstance();
     /**
      * 表信息服务
      */
-    private TableInfoSettingsService tableInfoService;
+    private final TableInfoSettingsService tableInfoService;
     /**
      * 项目对象
      */
-    private Project project;
+    private final Project project;
     /**
      * 代码生成服务
      */
-    private CodeGenerateService codeGenerateService;
+    private final CodeGenerateService codeGenerateService;
     /**
      * 当前项目中的module
      */
-    private List<Module> moduleList;
+    private final List<Module> moduleList;
 
     /**
      * 实体模式生成代码
      */
-    private boolean entityMode;
+    private final boolean entityMode;
 
     /**
      * 模板选择组件
@@ -132,8 +143,10 @@ public class SelectSavePath extends DialogWrapper {
 
     /**
      * 构造方法
+     *
+     * @param project project
      */
-    public SelectSavePath(Project project) {
+    public MainGenerate(Project project) {
         this(project, false);
     }
 
@@ -144,8 +157,11 @@ public class SelectSavePath extends DialogWrapper {
 
     /**
      * 构造方法
+     *
+     * @param project    project
+     * @param entityMode entityMode
      */
-    public SelectSavePath(Project project, boolean entityMode) {
+    public MainGenerate(Project project, boolean entityMode) {
         super(project);
         this.entityMode = entityMode;
         this.project = project;
@@ -170,13 +186,55 @@ public class SelectSavePath extends DialogWrapper {
         refreshPath();
     }
 
+    /**
+     * initEvent
+     */
     private void initEvent() {
-        //监听module选择事件
-        moduleComboBox.addActionListener(e -> {
-            // 刷新路径
-            refreshPath();
-        });
+        this.initModuleSelectedEvent();
+        this.initPackageChooseEvent();
+        this.initPathChooseEvent();
+        this.initSureCheckBoxEvent();
+    }
 
+    /**
+     * initSureCheckBoxEvent
+     */
+    private void initSureCheckBoxEvent() {
+        // 覆盖代码复选框互斥
+        ItemListener itemListener = e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED && e.getItemSelectable() == titleSureCheckBox) {
+                titleRefuseCheckBox.setSelected(false);
+            } else if (e.getStateChange() == ItemEvent.SELECTED && e.getItemSelectable() == titleRefuseCheckBox) {
+                titleSureCheckBox.setSelected(false);
+            }
+        };
+        titleSureCheckBox.addItemListener(itemListener);
+        titleRefuseCheckBox.addItemListener(itemListener);
+    }
+
+    /**
+     * initPathChooseEvent
+     */
+    private void initPathChooseEvent() {
+        //选择路径
+        pathChooseButton.addActionListener(e -> {
+            //将当前选中的model设置为基础路径
+            VirtualFile path = ProjectUtils.getBaseDir(project);
+            Module module = getSelectModule();
+            if (module != null) {
+                path = ModuleUtils.getSourcePath(module);
+            }
+            VirtualFile virtualFile = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), project, path);
+            if (virtualFile != null) {
+                pathField.setText(virtualFile.getPath());
+            }
+        });
+    }
+
+    /**
+     * initPackageChooseEvent
+     */
+    private void initPackageChooseEvent() {
         try {
             Class<?> cls = Class.forName("com.intellij.ide.util.PackageChooserDialog");
             //添加包选择事件
@@ -228,20 +286,14 @@ public class SelectSavePath extends DialogWrapper {
             packageField.setEnabled(false);
             packageChooseButton.setEnabled(false);
         }
+    }
 
-        //选择路径
-        pathChooseButton.addActionListener(e -> {
-            //将当前选中的model设置为基础路径
-            VirtualFile path = ProjectUtils.getBaseDir(project);
-            Module module = getSelectModule();
-            if (module != null) {
-                path = ModuleUtils.getSourcePath(module);
-            }
-            VirtualFile virtualFile = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), project, path);
-            if (virtualFile != null) {
-                pathField.setText(virtualFile.getPath());
-            }
-        });
+    /**
+     * initModuleSelectedEvent
+     */
+    private void initModuleSelectedEvent() {
+        //监听module选择事件
+        moduleComboBox.addActionListener(e -> refreshPath()); // 刷新路径
     }
 
     /**
@@ -297,6 +349,9 @@ public class SelectSavePath extends DialogWrapper {
         return null;
     }
 
+    /**
+     * refreshData
+     */
     private void refreshData() {
         // 获取选中的表信息（鼠标右键的那张表），并提示未知类型
         TableInfo tableInfo;
@@ -370,22 +425,29 @@ public class SelectSavePath extends DialogWrapper {
             }
         }
         // 保存配置
-        TableInfo tableInfo;
+        List<TableInfo> selectedTableInfoList;
         if (!entityMode) {
-            tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectDbTable());
+            selectedTableInfoList = cacheDataUtils.getDbTableList().stream()
+                    .map(dbTable -> TableInfoSettingsService.getInstance()
+                            .getTableInfo(dbTable)).collect(Collectors.toList());
         } else {
-            tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectPsiClass());
+            TableInfo tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectPsiClass());
+            selectedTableInfoList = new ArrayList<>();
+            selectedTableInfoList.add(tableInfo);
         }
-        tableInfo.setSavePath(savePath);
-        tableInfo.setSavePackageName(packageField.getText());
-        tableInfo.setPreName(preField.getText());
-        tableInfo.setTemplateGroupName(templateSelectComponent.getselectedGroupName());
-        Module module = getSelectModule();
-        if (module != null) {
-            tableInfo.setSaveModelName(module.getName());
-        }
-        // 保存配置
-        tableInfoService.saveTableInfo(tableInfo);
+        String finalSavePath = savePath;
+        selectedTableInfoList.forEach(tableInfo -> {
+            tableInfo.setSavePath(finalSavePath);
+            tableInfo.setSavePackageName(packageField.getText());
+            tableInfo.setPreName(preField.getText());
+            tableInfo.setTemplateGroupName(templateSelectComponent.getselectedGroupName());
+            Module module = getSelectModule();
+            if (module != null) {
+                tableInfo.setSaveModelName(module.getName());
+            }
+            // 保存配置
+            tableInfoService.saveTableInfo(tableInfo);
+        });
 
         // 生成代码
         codeGenerateService.generate(selectTemplateList, getGenerateOptions());
@@ -396,13 +458,52 @@ public class SelectSavePath extends DialogWrapper {
      */
     private void initPanel() {
         // 初始化模板组
-        this.templateSelectComponent = new TemplateSelectComponent();
+        this.templateSelectComponent = new TemplateSelectComponent(this.templateGroupComboBox);
         templatePanel.add(this.templateSelectComponent.getMainPanel(), BorderLayout.CENTER);
 
         //初始化Module选择
         for (Module module : this.moduleList) {
             moduleComboBox.addItem(module.getName());
         }
+
+        // 初始化模板组
+        this.initTemplateGroup();
+        // 初始化表配置
+        this.initTableConfigPanel();
+    }
+
+    /**
+     * 初始化表配置Panel
+     */
+    private void initTableConfigPanel() {
+        // 选中的表
+        List<TableInfo> selectedTables = CacheDataUtils.getInstance().getDbTableList().stream()
+                .map(dbTable -> TableInfoSettingsService.getInstance().getTableInfo(dbTable)).collect(Collectors.toList());
+
+        TableConfigJBTabs tabs = new TableConfigJBTabs(project, selectedTables);
+        int totalMinWidth = tabs.getTotalMinWidth();
+        this.tableConfigPane.add(tabs.getComponent(), BorderLayout.CENTER);
+        this.tableConfigPane.setMinimumSize(new Dimension(totalMinWidth, Math.max(300, totalMinWidth / 3)));
+    }
+
+    /**
+     * 初始化模板组
+     */
+    private void initTemplateGroup() {
+        this.templateGroupComboBox.removeAllItems();
+        for (String groupName : SettingsStorageService.getSettingsStorage().getTemplateGroupMap().keySet()) {
+            this.templateGroupComboBox.addItem(groupName);
+        }
+        this.templateGroupComboBox.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String groupName = (String) ((ComboBox<?>)e.getSource()).getSelectedItem();
+                if (StringUtils.isEmpty(groupName)) {
+                    return;
+                }
+                templateSelectComponent.refreshTemplatePanel(groupName);
+            }
+        });
     }
 
     /**
@@ -416,7 +517,7 @@ public class SelectSavePath extends DialogWrapper {
                 .reFormat(reFormatCheckBox.isSelected())
                 .titleSure(titleSureCheckBox.isSelected())
                 .titleRefuse(titleRefuseCheckBox.isSelected())
-                .unifiedConfig(unifiedConfigCheckBox.isSelected())
+                .unifiedConfig(true)
                 .build();
     }
 

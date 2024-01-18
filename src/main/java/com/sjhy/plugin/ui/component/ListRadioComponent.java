@@ -21,11 +21,11 @@ public class ListRadioComponent extends JPanel {
     /**
      * 标题
      */
-    private String title;
+    private final String title;
     /**
      * 原属列表
      */
-    private Collection<String> items;
+    private final Collection<String> items;
     /**
      * 复选框列表
      */

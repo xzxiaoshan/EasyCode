@@ -58,7 +58,7 @@ public class RealtimeDebugComponent {
      */
     private Map<String, DasTable> allTables;
 
-    private EditorComponent<Template> editorComponent;
+    private final EditorComponent<Template> editorComponent;
 
     public RealtimeDebugComponent(EditorComponent<Template> editorComponent) {
         this.editorComponent = editorComponent;
