@@ -4,8 +4,6 @@ import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.ui.tabs.JBTabs;
-import com.intellij.ui.tabs.JBTabsEx;
 import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.impl.JBTabsImpl;
 import org.jetbrains.annotations.NotNull;
