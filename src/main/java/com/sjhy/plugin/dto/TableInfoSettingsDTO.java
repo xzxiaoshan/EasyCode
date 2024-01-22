@@ -15,6 +15,7 @@ import lombok.Data;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -28,9 +29,14 @@ import java.util.TreeMap;
 @Data
 public class TableInfoSettingsDTO {
     private Map<String, String> tableInfoMap;
+    /**
+     * 数据库最后一次生成的表
+     */
+    private Map<String, String> databaseLastGenTableMap;
 
     public TableInfoSettingsDTO() {
         this.tableInfoMap = new TreeMap<>();
+        this.databaseLastGenTableMap = new HashMap<>();
     }
 
     private String generateKey(DbTable dbTable) {
@@ -76,6 +82,7 @@ public class TableInfoSettingsDTO {
         TableInfoDTO dto = decode(this.tableInfoMap.get(key));
         dto = new TableInfoDTO(dto, psiClass);
         this.tableInfoMap.put(key, encode(dto));
+        this.setDefaultTableGenConfig(key, dto);
         return dto.toTableInfo(psiClass);
     }
 
@@ -92,7 +99,60 @@ public class TableInfoSettingsDTO {
         // 表可能新增了字段，需要重新合并保存
         dto = new TableInfoDTO(dto, dbTable);
         this.tableInfoMap.put(key, encode(dto));
+        this.setDefaultTableGenConfig(key, dto);
         return dto.toTableInfo(dbTable);
+    }
+
+    /**
+     * setDefaultTableGenConfig
+     *
+     * @param tableKey tableKey
+     * @param dto      dto
+     */
+    private void setDefaultTableGenConfig(String tableKey, TableInfoDTO dto) {
+        // 如果该表没有历史生成的配置记录，则默认使用相同数据库中其他表最后一次生成的配置作为默认配置
+        if(StringUtils.isEmpty(dto.getSavePath()) && StringUtils.isEmpty(dto.getTemplateGroupName())) {
+            TableInfoDTO lasGenTableInfo = this.getLastGenTableInfo(tableKey);
+            if(lasGenTableInfo != null) {
+                dto.setSaveModelName(lasGenTableInfo.getSaveModelName());
+                dto.setSavePackageName(lasGenTableInfo.getSavePackageName());
+                dto.setSavePath(lasGenTableInfo.getSavePath());
+                dto.setPreName(lasGenTableInfo.getPreName());
+                dto.setTemplateGroupName(lasGenTableInfo.getTemplateGroupName());
+                dto.setSelectTemplateList(lasGenTableInfo.getSelectTemplateList());
+            }
+        }
+    }
+
+    /**
+     * 记录每个数据库最后一次生成过代码的表
+     *
+     * @param tableInfoKey tableInfoKey
+     */
+    private void saveDatabaseLastGenTableName(String tableInfoKey) {
+        int i = tableInfoKey.lastIndexOf(".");
+        String dbKey = tableInfoKey.substring(0, i);
+        String tableName = tableInfoKey.substring(i + 1);
+        this.databaseLastGenTableMap.put(dbKey, tableName);
+    }
+
+    /**
+     * 设置当前同数据库中其他表最后一次生成的配置
+     *
+     * @param currentTableKey currentTableKey
+     * @return TableInfoDTO
+     */
+    private TableInfoDTO getLastGenTableInfo(String currentTableKey) {
+        int i = currentTableKey.lastIndexOf(".");
+        String dbKey = currentTableKey.substring(0, i);
+        String lastDBGenTableName = this.databaseLastGenTableMap.get(dbKey);
+        if(!StringUtils.isEmpty(lastDBGenTableName)) {
+            String encodedData = this.tableInfoMap.get(dbKey.concat(".").concat(lastDBGenTableName));
+            if(!StringUtils.isEmpty(encodedData)) {
+                return decode(encodedData);
+            }
+        }
+        return null;
     }
 
     /**
@@ -115,6 +175,7 @@ public class TableInfoSettingsDTO {
             return;
         }
         this.tableInfoMap.put(key, encode(TableInfoDTO.valueOf(tableInfo)));
+        this.saveDatabaseLastGenTableName(key);
     }
 
     /**

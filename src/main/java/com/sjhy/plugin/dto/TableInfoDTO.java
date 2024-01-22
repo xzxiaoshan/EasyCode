@@ -8,7 +8,12 @@ import com.intellij.psi.PsiField;
 import com.intellij.util.containers.JBIterable;
 import com.sjhy.plugin.entity.ColumnInfo;
 import com.sjhy.plugin.entity.TableInfo;
-import com.sjhy.plugin.tool.*;
+import com.sjhy.plugin.tool.CollectionUtil;
+import com.sjhy.plugin.tool.DocCommentUtils;
+import com.sjhy.plugin.tool.JSON;
+import com.sjhy.plugin.tool.NameUtils;
+import com.sjhy.plugin.tool.PsiClassGenerateUtils;
+import com.sjhy.plugin.tool.StringUtils;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -28,6 +33,43 @@ import java.util.stream.Collectors;
 @Data
 @NoArgsConstructor
 public class TableInfoDTO {
+
+    /**
+     * 表名（首字母大写）
+     */
+    private String name;
+    /**
+     * 表名前缀
+     */
+    private String preName;
+    /**
+     * 注释
+     */
+    private String comment;
+    /**
+     * 模板组名称
+     */
+    private String templateGroupName;
+    /**
+     * 所有列
+     */
+    private List<ColumnInfoDTO> fullColumn;
+    /**
+     * 保存的包名称
+     */
+    private String savePackageName;
+    /**
+     * 保存路径
+     */
+    private String savePath;
+    /**
+     * 保存的model名称
+     */
+    private String saveModelName;
+    /**
+     * 选择的模板
+     */
+    private List<String> selectTemplateList;
 
     public TableInfoDTO(TableInfoDTO dto, DbTable dbTable) {
         this(dbTable);
@@ -78,6 +120,9 @@ public class TableInfoDTO {
         }
         if (!StringUtils.isEmpty(oldData.getTemplateGroupName())) {
             newData.templateGroupName = oldData.getTemplateGroupName();
+        }
+        if (!CollectionUtil.isEmpty(oldData.getSelectTemplateList())) {
+            newData.selectTemplateList = oldData.getSelectTemplateList();
         }
         if (!StringUtils.isEmpty(oldData.getSavePackageName())) {
             newData.savePackageName = oldData.getSavePackageName();
@@ -154,40 +199,6 @@ public class TableInfoDTO {
         newData.getFullColumn().addAll(tmpList);
     }
 
-
-    /**
-     * 表名（首字母大写）
-     */
-    private String name;
-    /**
-     * 表名前缀
-     */
-    private String preName;
-    /**
-     * 注释
-     */
-    private String comment;
-    /**
-     * 模板组名称
-     */
-    private String templateGroupName;
-    /**
-     * 所有列
-     */
-    private List<ColumnInfoDTO> fullColumn;
-    /**
-     * 保存的包名称
-     */
-    private String savePackageName;
-    /**
-     * 保存路径
-     */
-    private String savePath;
-    /**
-     * 保存的model名称
-     */
-    private String saveModelName;
-
     public TableInfo toTableInfo(PsiClass psiClass) {
         TableInfo tableInfo = new TableInfo();
         tableInfo.setPsiClassObj(psiClass);
@@ -230,6 +241,7 @@ public class TableInfoDTO {
         tableInfo.setName(this.getName());
         tableInfo.setPreName(this.getPreName());
         tableInfo.setTemplateGroupName(this.getTemplateGroupName());
+        tableInfo.setSelectTemplateList(this.getSelectTemplateList());
         tableInfo.setSavePackageName(this.getSavePackageName());
         tableInfo.setSavePath(this.getSavePath());
         tableInfo.setComment(this.getComment());
@@ -270,6 +282,7 @@ public class TableInfoDTO {
         TableInfoDTO dto = new TableInfoDTO();
         dto.setName(tableInfo.getName());
         dto.setTemplateGroupName(tableInfo.getTemplateGroupName());
+        dto.setSelectTemplateList(tableInfo.getSelectTemplateList());
         dto.setSavePath(tableInfo.getSavePath());
         dto.setPreName(tableInfo.getPreName());
         dto.setComment(tableInfo.getComment());

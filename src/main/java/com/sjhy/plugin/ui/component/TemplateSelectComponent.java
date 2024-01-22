@@ -7,6 +7,7 @@ import com.sjhy.plugin.entity.TemplateGroup;
 import com.sjhy.plugin.service.SettingsStorageService;
 import com.sjhy.plugin.tool.StringUtils;
 import lombok.Getter;
+import org.apache.commons.collections.CollectionUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -98,13 +101,45 @@ public class TemplateSelectComponent {
             JBCheckBox checkBox = new JBCheckBox(template.getName());
             this.checkBoxList.add(checkBox);
             this.templatePanel.add(checkBox);
+            this.setTemplateCheckBoxItemListener(checkBox);
         }
         this.allCheckbox.setSelected(true);
         handleSelectAllCheckBox();
         this.mainPanel.updateUI();
     }
 
-    public String getselectedGroupName() {
+    /**
+     * setTemplateCheckBoxItemListener
+     *
+     * @param checkBox checkBox
+     */
+    private void setTemplateCheckBoxItemListener(JBCheckBox checkBox) {
+        checkBox.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {// 当所有模板都逐个勾选后，全选自动勾选，当所有项都取消勾选后全选自动取消勾选
+                JBCheckBox eventCheckBox = (JBCheckBox)e.getSource();
+                int selectedCount = 0;
+                int notSelectedCount = 0;
+                int templateCount = checkBoxList.size() - 1;
+                for (int i = 1; i < checkBoxList.size(); i++) {// i==1是第一个All选项
+                    JBCheckBox item = checkBoxList.get(i);
+                    if(item.isSelected()){
+                        selectedCount++;
+                    } else {
+                        notSelectedCount++;
+                    }
+                }
+                if(eventCheckBox.isSelected() && selectedCount == templateCount) {
+                    checkBoxList.get(0).setSelected(true);
+                }
+                if(!eventCheckBox.isSelected() && notSelectedCount == templateCount) {
+                    checkBoxList.get(0).setSelected(false);
+                }
+            }
+        });
+    }
+
+    public String getSelectedGroupName() {
         return (String) this.groupComboBox.getSelectedItem();
     }
 
@@ -129,5 +164,21 @@ public class TemplateSelectComponent {
             }
         }
         return result;
+    }
+
+    /**
+     * 选中指定的模板项
+     *
+     * @param selectedTemplateList selectedTemplateList
+     */
+    public void setSelected(List<String> selectedTemplateList) {
+        if(CollectionUtils.isEmpty(selectedTemplateList)) {
+            return;
+        }
+        for (JBCheckBox checkBox : checkBoxList) {
+            checkBox.setSelected(selectedTemplateList.contains(checkBox.getText()));
+        }
+        // 判断是否被全部勾选（-1去掉All选项）
+        checkBoxList.get(0).setSelected(checkBoxList.size() - 1 == selectedTemplateList.size());
     }
 }

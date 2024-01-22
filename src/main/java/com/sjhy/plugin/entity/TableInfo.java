@@ -69,4 +69,8 @@ public class TableInfo {
      * 保存的model名称
      */
     private String saveModelName;
+    /**
+     * 选择的模板
+     */
+    private List<String> selectTemplateList;
 }

@@ -11,7 +11,7 @@ public interface GlobalDict {
     /**
      * 提示信息
      */
-    String TITLE_INFO = "EasyCode Title Info";
+    String TITLE_INFO = "EasyCode";
     /**
      * 版本号
      */

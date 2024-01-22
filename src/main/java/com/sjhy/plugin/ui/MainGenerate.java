@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiPackage;
 import com.intellij.ui.treeStructure.Tree;
@@ -63,7 +64,7 @@ public class MainGenerate extends DialogWrapper {
      */
     private JPanel contentPane;
     /**
-     * 模型下拉框
+     * Module下拉框
      */
     private JComboBox<String> moduleComboBox;
     /**
@@ -127,7 +128,7 @@ public class MainGenerate extends DialogWrapper {
      */
     private final CodeGenerateService codeGenerateService;
     /**
-     * 当前项目中的module
+     * 当前项目中的所有Module
      */
     private final List<Module> moduleList;
 
@@ -218,11 +219,19 @@ public class MainGenerate extends DialogWrapper {
     private void initPathChooseEvent() {
         //选择路径
         pathChooseButton.addActionListener(e -> {
-            //将当前选中的model设置为基础路径
-            VirtualFile path = ProjectUtils.getBaseDir(project);
-            Module module = getSelectModule();
-            if (module != null) {
-                path = ModuleUtils.getSourcePath(module);
+            VirtualFile path = null;
+            String textPath = pathField.getText();
+            if(!StringUtils.isEmpty(textPath)) {
+                path = LocalFileSystem.getInstance().findFileByPath(textPath);
+            }
+            //将当前选中的model设置为默认路径
+            if(path == null) {
+                Module module = getSelectModule();
+                if (module != null) {
+                    path = ModuleUtils.getSourcePath(module);
+                } else {
+                    path = ProjectUtils.getBaseDir(project);
+                }
             }
             VirtualFile virtualFile = FileChooser.chooseFile(FileChooserDescriptorFactory.createSingleFolderDescriptor(), project, path);
             if (virtualFile != null) {
@@ -378,7 +387,6 @@ public class MainGenerate extends DialogWrapper {
                 groupName = tableInfo.getTemplateGroupName();
             }
         }
-        templateSelectComponent.setSelectedGroupName(groupName);
         String savePath = tableInfo.getSavePath();
         if (!StringUtils.isEmpty(savePath)) {
             // 判断是否需要拼接项目路径
@@ -388,6 +396,8 @@ public class MainGenerate extends DialogWrapper {
             }
             pathField.setText(savePath);
         }
+        templateSelectComponent.setSelectedGroupName(groupName);
+        templateSelectComponent.setSelected(tableInfo.getSelectTemplateList());
     }
 
     @Override
@@ -440,7 +450,8 @@ public class MainGenerate extends DialogWrapper {
             tableInfo.setSavePath(finalSavePath);
             tableInfo.setSavePackageName(packageField.getText());
             tableInfo.setPreName(preField.getText());
-            tableInfo.setTemplateGroupName(templateSelectComponent.getselectedGroupName());
+            tableInfo.setTemplateGroupName(templateSelectComponent.getSelectedGroupName());
+            tableInfo.setSelectTemplateList(selectTemplateList.stream().map(Template::getName).collect(Collectors.toList()));
             Module module = getSelectModule();
             if (module != null) {
                 tableInfo.setSaveModelName(module.getName());
@@ -448,7 +459,6 @@ public class MainGenerate extends DialogWrapper {
             // 保存配置
             tableInfoService.saveTableInfo(tableInfo);
         });
-
         // 生成代码
         codeGenerateService.generate(selectTemplateList, getGenerateOptions());
     }
@@ -483,7 +493,7 @@ public class MainGenerate extends DialogWrapper {
         TableConfigJBTabs tabs = new TableConfigJBTabs(project, selectedTables);
         int totalMinWidth = tabs.getTotalMinWidth();
         this.tableConfigPane.add(tabs.getComponent(), BorderLayout.CENTER);
-        this.tableConfigPane.setMinimumSize(new Dimension(totalMinWidth, Math.max(300, totalMinWidth / 3)));
+        this.tableConfigPane.setMinimumSize(new Dimension(totalMinWidth, Math.max(300, totalMinWidth / 3) + 1));
     }
 
     /**

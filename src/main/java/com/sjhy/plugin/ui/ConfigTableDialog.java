@@ -61,7 +61,7 @@ public class ConfigTableDialog extends DialogWrapper {
         TableConfigJBTabs tabs = new TableConfigJBTabs(project, tableInfoList);
         int totalMinWidth = tabs.getTotalMinWidth();
         this.mainPanel.add(tabs.getComponent(), BorderLayout.CENTER);
-        this.mainPanel.setMinimumSize(new Dimension(totalMinWidth, Math.max(300, totalMinWidth / 3)));
+        this.mainPanel.setMinimumSize(new Dimension(totalMinWidth, Math.max(300, totalMinWidth / 3) + 1));
     }
 
     @Override

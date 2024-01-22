@@ -96,6 +96,8 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
                 tableInfo.setSavePackageName(finalSelectedTableInfo.getSavePackageName());
                 tableInfo.setSavePath(finalSelectedTableInfo.getSavePath());
                 tableInfo.setPreName(finalSelectedTableInfo.getPreName());
+                tableInfo.setTemplateGroupName(finalSelectedTableInfo.getTemplateGroupName());
+                tableInfo.setSelectTemplateList(finalSelectedTableInfo.getSelectTemplateList());
                 tableInfoService.saveTableInfo(tableInfo);
             }
         });
@@ -106,9 +108,10 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
                 tableInfo.setSavePackageName(finalSelectedTableInfo.getSavePackageName());
                 tableInfo.setSavePath(finalSelectedTableInfo.getSavePath());
                 tableInfo.setPreName(finalSelectedTableInfo.getPreName());
+                tableInfo.setTemplateGroupName(finalSelectedTableInfo.getTemplateGroupName());
+                tableInfo.setSelectTemplateList(finalSelectedTableInfo.getSelectTemplateList());
             });
         }
-
         // 生成代码
         generate(templates, tableInfoList, generateOptions, null);
     }

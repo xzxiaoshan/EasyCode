@@ -6,6 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
 import com.intellij.ui.BooleanTableCellEditor;
 import com.intellij.ui.BooleanTableCellRenderer;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.ToolbarDecorator;
 import com.intellij.ui.table.JBTable;
 import com.intellij.ui.tabs.TabInfo;
@@ -97,6 +98,7 @@ public class TableConfigJBTabs extends JBTabsImpl {
             String tabName = tableInfo.getObj().getName();
             TabInfo tabInfo = new TabInfo(toolbarDecorator.createPanel()).setText(tabName);
             tabInfo.setTabLabelActions(tabActions, tabName);
+            tabInfo.setTabColor(new JBColor(new Color( 43, 45, 46), new Color(78, 82, 84)));
             this.addTab(tabInfo);
         }
     }
