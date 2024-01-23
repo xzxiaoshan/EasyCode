@@ -83,10 +83,9 @@ public class SaveFile {
         // 路径对比，判断项目路径是否为文件保存路径的子路径
         String projectPath = handlerPath(baseDir.getPath());
         String tmpFilePath = handlerPath(callback.getSavePath());
-        if (tmpFilePath.length() > projectPath.length()) {
-            if (!"/".equals(tmpFilePath.substring(projectPath.length(), projectPath.length() + 1))) {
-                return false;
-            }
+        if (tmpFilePath.length() > projectPath.length()
+                && (!"/".equals(tmpFilePath.substring(projectPath.length(), projectPath.length() + 1)))) {
+            return false;
         }
         return tmpFilePath.indexOf(projectPath) == 0;
     }
@@ -173,13 +172,13 @@ public class SaveFile {
         }
         // 尝试创建目录
         String msg = String.format("Directory %s Not Found, Confirm Create?", callback.getSavePath());
-        if (generateOptions.getTitleSure()) {
+        if (Boolean.TRUE.equals(generateOptions.getTitleSure())) {
             saveDir = fileUtils.createChildDirectory(project, baseDir, savePath);
             return saveDir;
-        } else if (generateOptions.getTitleRefuse()) {
+        } else if (Boolean.TRUE.equals(generateOptions.getTitleRefuse())) {
             return null;
         } else {
-            if (MessageDialogUtils.yesNo(project, msg)) {
+            if (MessageDialogUtils.yesNo(msg)) {
                 saveDir = fileUtils.createChildDirectory(project, baseDir, savePath);
                 return saveDir;
             }
@@ -205,15 +204,15 @@ public class SaveFile {
             document = coverFile(file);
         } else {
             // 提示覆盖文件
-            if (generateOptions.getTitleSure()) {
+            if (Boolean.TRUE.equals(generateOptions.getTitleSure())) {
                 // 默认选是
                 document = coverFile(file);
-            } else if (generateOptions.getTitleRefuse()) {
+            } else if (Boolean.TRUE.equals(generateOptions.getTitleRefuse())) {
                 // 默认选否
                 return;
             } else {
                 String msg = String.format("File %s Exists, Select Operate Mode?", file.getPath());
-                int result = MessageDialogUtils.yesNoCancel(project, msg, "Convert", "Compare", "Cancel");
+                int result = MessageDialogUtils.yesNoCancel(msg, "Convert", "Compare", "Cancel");
                 switch (result) {
                     case Messages.YES:
                         // 覆盖文件

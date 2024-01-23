@@ -15,7 +15,8 @@ import java.util.List;
  */
 @Data
 public class CacheDataUtils {
-    private volatile static CacheDataUtils cacheDataUtils;
+
+    private static volatile CacheDataUtils cacheDataUtils;
 
     /**
      * 单例模式

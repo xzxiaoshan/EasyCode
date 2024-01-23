@@ -1,7 +1,7 @@
 package com.sjhy.plugin.service;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.sjhy.plugin.dto.SettingsStorageDTO;
 import com.sjhy.plugin.service.impl.SettingsStorageServiceImpl;
 
@@ -17,7 +17,7 @@ public interface SettingsStorageService extends PersistentStateComponent<Setting
      * @return {@link SettingsStorageService}
      */
     static SettingsStorageService getInstance() {
-        return ServiceManager.getService(SettingsStorageServiceImpl.class);
+        return ApplicationManager.getApplication().getService(SettingsStorageServiceImpl.class);
     }
 
     /**

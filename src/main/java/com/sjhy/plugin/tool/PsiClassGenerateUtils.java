@@ -25,10 +25,7 @@ public final class PsiClassGenerateUtils {
         if (existsAnnotation(field, "org.springframework.data.annotation.Id")) {
             return true;
         }
-        if (existsAnnotation(field, "javax.persistence.Id")) {
-            return true;
-        }
-        return false;
+        return existsAnnotation(field, "javax.persistence.Id");
     }
 
     /**
@@ -42,10 +39,7 @@ public final class PsiClassGenerateUtils {
         if (existsAnnotation(field, "org.springframework.data.annotation.Transient")) {
             return true;
         }
-        if (existsAnnotation(field, "javax.persistence.Transient")) {
-            return true;
-        }
-        return false;
+        return existsAnnotation(field, "javax.persistence.Transient");
     }
 
     private static boolean existsAnnotation(PsiField field, String clsName) {

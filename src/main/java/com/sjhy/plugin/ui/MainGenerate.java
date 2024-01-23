@@ -382,10 +382,9 @@ public class MainGenerate extends DialogWrapper {
         }
         SettingsStorageDTO settings = SettingsStorageService.getSettingsStorage();
         String groupName = settings.getCurrTemplateGroupName();
-        if (!StringUtils.isEmpty(tableInfo.getTemplateGroupName())) {
-            if (settings.getTemplateGroupMap().containsKey(tableInfo.getTemplateGroupName())) {
-                groupName = tableInfo.getTemplateGroupName();
-            }
+        if (!StringUtils.isEmpty(tableInfo.getTemplateGroupName())
+                && settings.getTemplateGroupMap().containsKey(tableInfo.getTemplateGroupName())) {
+            groupName = tableInfo.getTemplateGroupName();
         }
         String savePath = tableInfo.getSavePath();
         if (!StringUtils.isEmpty(savePath)) {

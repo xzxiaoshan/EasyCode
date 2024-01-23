@@ -45,7 +45,11 @@ public class MainSettingForm implements Configurable, Configurable.Composite, Ba
      */
     private Configurable[] childConfigurableArray;
 
+    /**
+     * MainSettingForm
+     */
     public MainSettingForm() {
+        // nothing
     }
 
     private void initLocalExportEvent() {
@@ -130,13 +134,8 @@ public class MainSettingForm implements Configurable, Configurable.Composite, Ba
 
     @Override
     public boolean isModified() {
-        if (!Objects.equals(this.authorEditor.getText(), getSettingsStorage().getAuthor())) {
-            return true;
-        }
-        if (!Objects.equals(this.userSecureEditor.getText(), getSettingsStorage().getUserSecure())) {
-            return true;
-        }
-        return false;
+        return !Objects.equals(this.authorEditor.getText(), getSettingsStorage().getAuthor())
+                || !Objects.equals(this.userSecureEditor.getText(), getSettingsStorage().getUserSecure());
     }
 
     @Override

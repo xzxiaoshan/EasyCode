@@ -77,8 +77,8 @@ public class TypeMapperSettingForm implements BaseSettings {
 
     private void initGroupName() {
         // 切换分组操作
-        Consumer<TypeMapperGroup> switchGroupOperator = typeMapperGroupMap -> {
-            this.currTypeMapperGroup = typeMapperGroupMap;
+        Consumer<TypeMapperGroup> switchGroupOperator = typeMapperGroup -> {
+            this.currTypeMapperGroup = typeMapperGroup;
             refreshUiVal();
         };
         this.groupNameComponent = new GroupNameComponent<>(switchGroupOperator, this.typeMapperGroupMap);

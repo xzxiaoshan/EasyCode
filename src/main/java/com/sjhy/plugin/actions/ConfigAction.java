@@ -1,6 +1,5 @@
 package com.sjhy.plugin.actions;
 
-import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
@@ -12,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**

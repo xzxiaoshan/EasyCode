@@ -12,6 +12,13 @@ import com.intellij.openapi.editor.EditorSettings;
  */
 public class EditorSettingsInit {
 
+    /**
+     * EditorSettingsInit
+     */
+    private EditorSettingsInit() {
+        // nothing
+    }
+
     public static void init(Editor editor) {
         EditorSettings editorSettings = editor.getSettings();
         // 关闭虚拟空间

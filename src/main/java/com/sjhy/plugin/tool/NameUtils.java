@@ -11,7 +11,10 @@ import java.util.regex.Pattern;
  * @since 2018/07/17 13:10
  */
 public class NameUtils {
-    private volatile static NameUtils nameUtils;
+    /**
+     * nameUtils
+     */
+    private static volatile NameUtils nameUtils;
 
     /**
      * 单例模式
@@ -30,7 +33,7 @@ public class NameUtils {
     /**
      * 私有构造方法
      */
-    NameUtils() {
+    public NameUtils() {
     }
 
     /**

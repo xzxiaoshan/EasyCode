@@ -1,6 +1,5 @@
 package com.sjhy.plugin.service;
 
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.sjhy.plugin.dto.GenerateOptions;
 import com.sjhy.plugin.entity.TableInfo;
@@ -24,7 +23,7 @@ public interface CodeGenerateService {
      * @return 实例对象
      */
     static CodeGenerateService getInstance(@NotNull Project project) {
-        return ServiceManager.getService(project, CodeGenerateService.class);
+        return project.getService(CodeGenerateService.class);
     }
 
     /**

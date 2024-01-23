@@ -111,6 +111,12 @@ public class TableInfoDTO {
         }
     }
 
+    /**
+     * 合并
+     *
+     * @param oldData oldData
+     * @param newData newData
+     */
     private static void merge(TableInfoDTO oldData, TableInfoDTO newData) {
         if (oldData == null || CollectionUtil.isEmpty(oldData.getFullColumn())) {
             return;

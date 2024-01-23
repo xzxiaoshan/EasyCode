@@ -53,8 +53,11 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
     /**
      * 所有列的ColumnConfig集合
      */
-    public List<ColumnConfig> allColumnConfigList = new ArrayList<>();
+    private final List<ColumnConfig> allColumnConfigList = new ArrayList<>();
 
+    /**
+     * 表信息
+     */
     private TableInfo tableInfo;
 
     public ConfigTableModel(TableInfo tableInfo) {

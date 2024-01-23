@@ -36,8 +36,7 @@ public final class TemplateUtils {
             String name = globalConfig.getName();
             // 正则被替换字符转义处理
             String value = globalConfig.getValue().replace("\\", "\\\\").replace("$", "\\$");
-
-            // 将不带{}的变量加上{}
+            // 将不带“{}”的变量加上“{}”
             template = template.replaceAll("\\$!?" + name + "(\\W)", "\\$!{" + name + "}$1");
             // 统一替换
             template = template.replaceAll("\\$!?\\{" + name + "}", value);

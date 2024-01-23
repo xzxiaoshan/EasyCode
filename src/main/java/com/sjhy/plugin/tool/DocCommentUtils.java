@@ -17,6 +17,13 @@ import java.util.Arrays;
 public class DocCommentUtils {
 
     /**
+     * DocCommentUtils
+     */
+    private DocCommentUtils() {
+        // nothing
+    }
+
+    /**
      * 获取注释信息，获取第一条文本类型注释内容，不存在则返回null
      *
      * @param docComment 文档注释

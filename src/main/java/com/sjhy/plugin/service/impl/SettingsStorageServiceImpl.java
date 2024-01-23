@@ -4,7 +4,6 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.sjhy.plugin.dto.SettingsStorageDTO;
 import com.sjhy.plugin.service.SettingsStorageService;
-import lombok.Data;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

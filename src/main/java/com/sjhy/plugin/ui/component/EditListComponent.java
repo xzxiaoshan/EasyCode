@@ -145,7 +145,7 @@ public class EditListComponent<E extends AbstractEditorItem<E>> {
             @Override
             public void update(@NotNull AnActionEvent e) {
                 E selectItem = findByName(currentItem);
-                boolean enabled = selectItem != null && elementList.indexOf(selectItem) > 0;
+                boolean enabled = selectItem != null && elementList.contains(selectItem);
                 e.getPresentation().setEnabled(enabled);
             }
         };
@@ -225,7 +225,7 @@ public class EditListComponent<E extends AbstractEditorItem<E>> {
         } finally {
             this.refresh = false;
         }
-        if (StringUtils.isEmpty(this.currentItem) && elementList != null && elementList.size() > 0) {
+        if (StringUtils.isEmpty(this.currentItem) && elementList != null && !elementList.isEmpty()) {
             setCurrentItem(elementList.get(0).fileName());
             switchItemFun.accept(findByName(this.currentItem));
         }

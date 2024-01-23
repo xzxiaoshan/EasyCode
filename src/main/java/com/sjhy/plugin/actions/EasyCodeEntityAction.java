@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
-import com.intellij.openapi.actionSystem.LangDataKeys;
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -44,16 +44,16 @@ public class EasyCodeEntityAction extends AnAction {
         PsiManager psiManager = PsiManager.getInstance(project);
         List<PsiJavaFile> psiJavaFiles = Arrays.stream(psiFiles)
                 .map(psiManager::findFile)
-                .filter(f -> f instanceof PsiJavaFile)
+                .filter(PsiJavaFile.class::isInstance)
                 .map(f -> (PsiJavaFile) f)
                 .collect(Collectors.toList());
-        if (psiJavaFiles.size() == 0) {
+        if (psiJavaFiles.isEmpty()) {
             return;
         }
 
         // 获取选中的类
         List<PsiClass> psiClassList = resolvePsiClassByFile(psiJavaFiles);
-        if (psiClassList.size() == 0) {
+        if (psiClassList.isEmpty()) {
             return;
         }
 
@@ -80,7 +80,7 @@ public class EasyCodeEntityAction extends AnAction {
     public void update(@NotNull AnActionEvent event) {
         // 不存在模块不展示：选择多个模块
         Project project = event.getData(CommonDataKeys.PROJECT);
-        Module module = event.getData(LangDataKeys.MODULE);
+        Module module = event.getData(PlatformCoreDataKeys.MODULE);
         if (project == null || module == null) {
             event.getPresentation().setVisible(false);
             return;
@@ -90,7 +90,6 @@ public class EasyCodeEntityAction extends AnAction {
         VirtualFile file = event.getDataContext().getData(CommonDataKeys.VIRTUAL_FILE);
         if (file != null && !file.isDirectory() && !"java".equals(file.getExtension())) {
             event.getPresentation().setVisible(false);
-            return;
         }
     }
 

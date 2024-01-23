@@ -13,6 +13,13 @@ import java.util.Map;
 public class CollectionUtil {
 
     /**
+     * CollectionUtil
+     */
+    private CollectionUtil() {
+        // nothing
+    }
+
+    /**
      * 判断集合是否为空的
      *
      * @param collection 集合对象

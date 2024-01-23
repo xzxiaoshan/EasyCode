@@ -46,6 +46,13 @@ public class JSON {
         INSTANCE.setDateFormat(new SimpleDateFormat(DATE_FORMAT));
     }
 
+    /**
+     * 私有构造方法
+     */
+    private JSON() {
+        // nothing
+    }
+
     public static ObjectMapper getInstance() {
         return INSTANCE;
     }

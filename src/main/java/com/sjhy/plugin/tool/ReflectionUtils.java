@@ -18,6 +18,13 @@ import java.util.Objects;
  */
 public class ReflectionUtils {
 
+    /**
+     * ReflectionUtils
+     */
+    private ReflectionUtils() {
+        // nothing
+    }
+
     public static Class<?> getGenericClass(Object obj, int index) {
         // 获取泛型接口
         Type type = obj.getClass().getGenericInterfaces()[0];

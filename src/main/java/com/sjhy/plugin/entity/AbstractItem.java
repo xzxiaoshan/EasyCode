@@ -9,7 +9,7 @@ import com.sjhy.plugin.tool.CloneUtils;
  * @version 1.0.0
  * @date 2021/08/11 09:47
  */
-public interface AbstractItem<T extends AbstractItem> {
+public interface AbstractItem<T extends AbstractItem<T>> {
     /**
      * 默认值
      *

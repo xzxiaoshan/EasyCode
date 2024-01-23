@@ -1,7 +1,7 @@
 package com.sjhy.plugin.tool;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VfsUtil;
@@ -42,7 +42,7 @@ public final class ModuleUtils {
                 return contentRoot;
             }
         }
-        String modulePath = ModuleUtil.getModuleDirPath(module);
+        String modulePath = ModuleUtilCore.getModuleDirPath(module);
         // 统一路径分割符号
         modulePath = modulePath.replace("\\", "/");
         // 尝试消除不正确的路径

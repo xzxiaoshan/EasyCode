@@ -2,7 +2,6 @@ package com.sjhy.plugin.tool;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.runtime.RuntimeConstants;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;

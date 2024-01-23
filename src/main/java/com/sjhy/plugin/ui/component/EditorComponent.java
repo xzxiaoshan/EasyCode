@@ -14,8 +14,8 @@ import com.intellij.openapi.ui.Splitter;
 import com.intellij.ui.BrowserHyperlinkListener;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.SeparatorFactory;
+import com.intellij.util.ui.HTMLEditorKitBuilder;
 import com.intellij.util.ui.JBUI;
-import com.intellij.util.ui.UIUtil;
 import com.sjhy.plugin.entity.AbstractEditorItem;
 import com.sjhy.plugin.tool.ProjectUtils;
 import com.sjhy.plugin.ui.base.EditorSettingsInit;
@@ -70,8 +70,8 @@ public class EditorComponent<T extends AbstractEditorItem> {
         // 添加监控事件
         this.editor.getDocument().addDocumentListener(new DocumentListener() {
             @Override
-            public void beforeDocumentChange(DocumentEvent event) {
-
+            public void beforeDocumentChange(@NotNull DocumentEvent event) {
+                // nothing
             }
 
             @Override
@@ -89,7 +89,7 @@ public class EditorComponent<T extends AbstractEditorItem> {
         // 描述信息
         JEditorPane editorPane = new JEditorPane();
         // html形式展示
-        editorPane.setEditorKit(UIUtil.getHTMLEditorKit());
+        editorPane.setEditorKit(HTMLEditorKitBuilder.simple());
         // 仅查看
         editorPane.setEditable(false);
         editorPane.setText(remark);

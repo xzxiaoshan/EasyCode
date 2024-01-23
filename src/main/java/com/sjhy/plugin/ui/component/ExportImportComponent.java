@@ -9,6 +9,7 @@ import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.sjhy.plugin.dict.GlobalDict;
 import com.sjhy.plugin.dto.SettingsStorageDTO;
 import com.sjhy.plugin.entity.AbstractGroup;
+import com.sjhy.plugin.entity.AbstractItem;
 import com.sjhy.plugin.service.ExportImportSettingsService;
 import com.sjhy.plugin.service.SettingsStorageService;
 import com.sjhy.plugin.tool.CloneUtils;
@@ -157,12 +158,12 @@ public class ExportImportComponent {
         // 对同名分组进行覆盖、放弃、改名操作
         // 创建主面板
         JPanel mainPanel = new JPanel(new VerticalFlowLayout());
-        List<Handler> allHandlerList = new ArrayList<>();
+        List<Handler<?>> allHandlerList = new ArrayList<>();
         addRadioComponent(allHandlerList, "TypeMapper", localSettings.getTypeMapperGroupMap(), remoteSettings.getTypeMapperGroupMap());
         addRadioComponent(allHandlerList, "Template", localSettings.getTemplateGroupMap(), remoteSettings.getTemplateGroupMap());
         addRadioComponent(allHandlerList, "ColumnConfig", localSettings.getColumnConfigGroupMap(), remoteSettings.getColumnConfigGroupMap());
         addRadioComponent(allHandlerList, "GlobalConfig", localSettings.getGlobalConfigGroupMap(), remoteSettings.getGlobalConfigGroupMap());
-        for (Handler handler : allHandlerList) {
+        for (Handler<?> handler : allHandlerList) {
             if (handler.getRadioComponent() != null) {
                 mainPanel.add(handler.getRadioComponent());
             }
@@ -171,7 +172,7 @@ public class ExportImportComponent {
         boolean anyMatch = allHandlerList.stream().anyMatch(item -> item.getRadioComponent() != null);
         if (!anyMatch) {
             // 执行每个处理器
-            for (Handler handler : allHandlerList) {
+            for (Handler<?> handler : allHandlerList) {
                 handler.execute();
             }
             // 执行回调
@@ -189,7 +190,7 @@ public class ExportImportComponent {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // 执行每个处理器
-                for (Handler handler : allHandlerList) {
+                for (Handler<?> handler : allHandlerList) {
                     handler.execute();
                 }
                 // 执行回调
@@ -205,7 +206,9 @@ public class ExportImportComponent {
         dialogBuilder.show();
     }
 
-    private <T extends AbstractGroup> void addRadioComponent(List<Handler> allHandlerList, String groupName, Map<String, T> localMap, Map<String, T> remoteMap) {
+    private <T extends AbstractGroup<T, ?>> void addRadioComponent(List<Handler<?>> allHandlerList, String groupName, Map<String, T> localMap,
+                                                                   Map<String,
+            T> remoteMap) {
         if (CollectionUtil.isEmpty(remoteMap)) {
             return;
         }
@@ -219,7 +222,7 @@ public class ExportImportComponent {
         }
     }
 
-    private static class Handler<T extends AbstractGroup> {
+    private static class Handler<T extends AbstractGroup<T, ?>> {
         @Getter
         private ListRadioComponent radioComponent;
 

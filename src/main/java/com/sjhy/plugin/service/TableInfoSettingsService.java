@@ -3,7 +3,6 @@ package com.sjhy.plugin.service;
 import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.components.PersistentStateComponent;
-import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiClass;
 import com.sjhy.plugin.dto.TableInfoSettingsDTO;
@@ -26,7 +25,7 @@ public interface TableInfoSettingsService extends PersistentStateComponent<Table
      */
     static TableInfoSettingsService getInstance() {
         try {
-            return ServiceManager.getService(ProjectUtils.getCurrProject(), TableInfoSettingsServiceImpl.class);
+            return ProjectUtils.getCurrProject().getService(TableInfoSettingsServiceImpl.class);
         } catch (AssertionError e) {
             // 出现配置文件被错误修改，或不兼容时直接删除配置文件。
             VirtualFile workspaceFile = ProjectUtils.getCurrProject().getWorkspaceFile();
@@ -43,7 +42,7 @@ public interface TableInfoSettingsService extends PersistentStateComponent<Table
                 }
             }
             // 重新获取配置
-            return ServiceManager.getService(ProjectUtils.getCurrProject(), TableInfoSettingsServiceImpl.class);
+            return ProjectUtils.getCurrProject().getService(TableInfoSettingsServiceImpl.class);
         }
     }
 

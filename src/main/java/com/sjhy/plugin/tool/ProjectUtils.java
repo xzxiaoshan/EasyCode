@@ -21,6 +21,13 @@ import java.awt.*;
 public class ProjectUtils {
 
     /**
+     * ProjectUtils
+     */
+    private ProjectUtils() {
+        // nothing
+    }
+
+    /**
      * 获取当前项目对象
      *
      * @return 当前项目对象
@@ -46,6 +53,7 @@ public class ProjectUtils {
                 }
             }
         } catch (Exception ignored) {
+            // ignore
         }
 
         //否则使用默认项目

@@ -10,6 +10,6 @@ import org.junit.Test;
 public class MinTest {
     @Test
     public void run() {
-
+        // nothing
     }
 }

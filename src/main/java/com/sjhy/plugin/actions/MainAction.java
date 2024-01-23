@@ -38,12 +38,17 @@ import java.util.regex.PatternSyntaxException;
  * @since 2018/07/17 13:10
  */
 public class MainAction extends AnAction {
+
+    public MainAction(){
+        super();
+    }
+
     /**
      * 构造方法
      *
      * @param text 菜单名称
      */
-    MainAction(@Nullable String text) {
+    public MainAction(@Nullable String text) {
         super(text);
     }
 

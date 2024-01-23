@@ -9,9 +9,17 @@ import com.sjhy.plugin.entity.DebugMethod;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * 全局工具类
@@ -22,12 +30,21 @@ import java.util.*;
  */
 @SuppressWarnings("unused")
 public class GlobalTool extends NameUtils {
+    /**
+     * globalTool
+     */
     private static volatile GlobalTool globalTool;
+
+    /**
+     * random
+     */
+    private final Random random = new Random();
 
     /**
      * 私有构造方法
      */
-    private GlobalTool() {
+    public GlobalTool() {
+        super();
     }
 
     /**
@@ -50,7 +67,7 @@ public class GlobalTool extends NameUtils {
      * @param items 初始元素
      * @return 集合对象
      */
-    public Set<?> newHashSet(Object... items) {
+    public Set<Object> newHashSet(Object... items) {
         return items == null ? new HashSet<>() : new HashSet<>(Arrays.asList(items));
     }
 
@@ -60,7 +77,7 @@ public class GlobalTool extends NameUtils {
      * @param items 初始元素
      * @return 列表对象
      */
-    public List<?> newArrayList(Object... items) {
+    public List<Object> newArrayList(Object... items) {
         return items == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(items));
     }
 
@@ -69,7 +86,7 @@ public class GlobalTool extends NameUtils {
      *
      * @return map对象
      */
-    public Map<?, ?> newLinkedHashMap() {
+    public Map<Object, Object> newLinkedHashMap() {
         return new LinkedHashMap<>();
     }
 
@@ -78,7 +95,7 @@ public class GlobalTool extends NameUtils {
      *
      * @return map对象
      */
-    public Map<?, ?> newHashMap() {
+    public Map<Object, Object> newHashMap() {
         return new HashMap<>(16);
     }
 
@@ -103,7 +120,7 @@ public class GlobalTool extends NameUtils {
      * @param obj 接收执行返回值
      */
     public void call(Object... obj) {
-
+        // nothing
     }
 
     /**
@@ -207,7 +224,6 @@ public class GlobalTool extends NameUtils {
      * @return 序列化
      */
     public String serial() {
-        Random random = new Random();
         StringBuilder builder = new StringBuilder();
         // 正负号生成
         if (random.nextFloat() > 0.5F) {

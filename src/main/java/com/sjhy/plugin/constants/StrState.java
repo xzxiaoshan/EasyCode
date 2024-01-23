@@ -8,8 +8,17 @@ package com.sjhy.plugin.constants;
  * @since 2018/09/03 09:32
  */
 public class StrState {
+
+    /**
+     * StrState
+     */
+    private StrState() {
+        // nothing
+    }
+
     /**
      * 相对路径常量
      */
     public static final String RELATIVE_PATH = "./";
+
 }

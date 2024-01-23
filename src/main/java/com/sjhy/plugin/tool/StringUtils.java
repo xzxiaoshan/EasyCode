@@ -14,6 +14,13 @@ import java.util.function.Function;
 public class StringUtils {
 
     /**
+     * StringUtils
+     */
+    private StringUtils() {
+        // nothing
+    }
+
+    /**
      * 首字母处理方法
      */
     private static final BiFunction<String, Function<Integer, Integer>, String> FIRST_CHAR_HANDLER_FUN = (str, firstCharFun) -> {
@@ -34,7 +41,8 @@ public class StringUtils {
         int outOffset = 0;
         // copy the first codepoint
         newCodePoints[outOffset++] = newCodePoint;
-        for (int inOffset = Character.charCount(firstCodepoint); inOffset < strLen; ) {
+        int inOffset = Character.charCount(firstCodepoint);
+        while(inOffset < strLen) {
             final int codepoint = str.codePointAt(inOffset);
             // copy the remaining ones
             newCodePoints[outOffset++] = codepoint;

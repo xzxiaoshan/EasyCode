@@ -299,6 +299,10 @@
             <!--生成代码菜单-->
             <add-to-group group-id="DatabaseViewPopupMenu" anchor="first"/>
         </group>
+        <action id="com.sjhy.easy.code.action.generate.toolbar" class="com.sjhy.plugin.actions.MainAction" text="Generate Code"
+                icon="com.intellij.icons.ExpUiIcons.FileTypes.SourceMap">
+            <add-to-group group-id="DatabaseViewToolbar" anchor="before" relative-to-action="Jdbc.OpenConsole.Any"/>
+        </action>
     </actions>
 
 </idea-plugin>

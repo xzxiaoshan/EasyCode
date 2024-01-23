@@ -13,6 +13,13 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class AbstractItemFactory {
 
+    /**
+     * AbstractItemFactory
+     */
+    private AbstractItemFactory() {
+        // nothing
+    }
+
     public static <T extends AbstractItem<T>> T createDefaultVal(Class<T> cls) {
         try {
             T instance = cls.getDeclaredConstructor().newInstance();

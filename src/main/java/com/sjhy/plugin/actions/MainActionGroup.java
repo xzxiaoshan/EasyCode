@@ -1,11 +1,16 @@
 package com.sjhy.plugin.actions;
 
 import com.intellij.database.psi.DbTable;
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.ActionGroup;
+import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys;
+import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiElement;
-import com.intellij.ui.treeStructure.Tree;
 import com.sjhy.plugin.dict.GlobalDict;
 import com.sjhy.plugin.service.TableInfoSettingsService;
 import com.sjhy.plugin.tool.CacheDataUtils;
@@ -29,11 +34,6 @@ public class MainActionGroup extends ActionGroup {
     private final CacheDataUtils cacheDataUtils = CacheDataUtils.getInstance();
 
     /**
-     * 是否不存在子菜单
-     */
-    private boolean notExistsChildren;
-
-    /**
      * 根据右键在不同的选项上展示不同的子菜单
      *
      * @param event 事件对象
@@ -43,12 +43,15 @@ public class MainActionGroup extends ActionGroup {
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
         // 获取当前项目
         Project project = getEventProject(event);
+        if(event == null) {
+            return AnAction.EMPTY_ARRAY;
+        }
         if (project == null) {
             return getEmptyAnAction(event);
         }
 
         //获取选中的PSI元素
-        PsiElement psiElement = event.getData(LangDataKeys.PSI_ELEMENT);
+        PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
         DbTable selectDbTable = null;
         if (psiElement instanceof DbTable) {
             selectDbTable = (DbTable) psiElement;
@@ -57,7 +60,7 @@ public class MainActionGroup extends ActionGroup {
             return getEmptyAnAction(event);
         }
         //获取选中的所有表
-        PsiElement[] psiElements = event.getData(LangDataKeys.PSI_ELEMENT_ARRAY);
+        PsiElement[] psiElements = event.getData(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY);
         if (psiElements == null || psiElements.length == 0) {
             return getEmptyAnAction(event);
         }

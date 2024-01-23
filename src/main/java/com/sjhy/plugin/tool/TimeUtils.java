@@ -11,6 +11,10 @@ import java.util.Date;
  * @since 2018/07/19 13:16
  */
 public class TimeUtils {
+
+    /**
+     * timeUtils
+     */
     private static volatile TimeUtils timeUtils;
 
     /**
@@ -29,8 +33,11 @@ public class TimeUtils {
         return timeUtils;
     }
 
+    /**
+     * TimeUtils
+     */
     private TimeUtils() {
-
+        // nothing
     }
 
     /**
