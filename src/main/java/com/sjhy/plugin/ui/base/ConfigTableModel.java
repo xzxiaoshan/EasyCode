@@ -8,6 +8,7 @@ import com.sjhy.plugin.enums.ColumnConfigType;
 import com.sjhy.plugin.tool.CollectionUtil;
 import com.sjhy.plugin.tool.CurrGroupUtils;
 import com.sjhy.plugin.tool.StringUtils;
+import lombok.Getter;
 
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
@@ -19,6 +20,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
+ * ConfigTableModel
+ *
  * @author makejava
  * @version 1.0.0
  * @date 2021/08/14 13:41
@@ -58,14 +61,23 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
     /**
      * 表信息
      */
+    @Getter
     private TableInfo tableInfo;
 
+    /**
+     * ConfigTableModel
+     *
+     * @param tableInfo tableInfo
+     */
     public ConfigTableModel(TableInfo tableInfo) {
         this.tableInfo = tableInfo;
         this.initColumn();
         this.initTableData();
     }
 
+    /**
+     * initColumn
+     */
     private void initColumn() {
         // 默认列
         this.allColumnConfigList.add(new ColumnConfig(TITLE_NAME, ColumnConfigType.TEXT));
@@ -97,6 +109,9 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
         return this.allColumnConfigList.get(columnIndex);
     }
 
+    /**
+     * initTableData
+     */
     private void initTableData() {
         // 删除所有列
         int size = getRowCount();
@@ -238,7 +253,4 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
         return super.isCellEditable(row, column);
     }
 
-    public TableInfo getTableInfo() {
-        return tableInfo;
-    }
 }

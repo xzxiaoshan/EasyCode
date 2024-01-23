@@ -143,6 +143,11 @@ public class MainGenerate extends DialogWrapper {
     private TemplateSelectComponent templateSelectComponent;
 
     /**
+     * 选中的表
+     */
+    private List<TableInfo> selectedTables;
+
+    /**
      * 构造方法
      *
      * @param project project
@@ -168,6 +173,8 @@ public class MainGenerate extends DialogWrapper {
         this.project = project;
         this.tableInfoService = TableInfoSettingsService.getInstance();
         this.codeGenerateService = CodeGenerateService.getInstance(project);
+        this.initSelectedTables();
+
         // 初始化module，存在资源路径的排前面
         this.moduleList = new LinkedList<>();
         for (Module module : ModuleManager.getInstance(project).getModules()) {
@@ -185,6 +192,21 @@ public class MainGenerate extends DialogWrapper {
         setTitle(GlobalDict.TITLE_INFO);
         //初始化路径
         refreshPath();
+    }
+
+    /**
+     * initSelectedTables
+     */
+    private void initSelectedTables() {
+        if (!this.entityMode) {
+            selectedTables = cacheDataUtils.getDbTableList().stream()
+                    .map(dbTable -> TableInfoSettingsService.getInstance()
+                            .getTableInfo(dbTable)).collect(Collectors.toList());
+        } else {
+            TableInfo tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectPsiClass());
+            selectedTables = new ArrayList<>();
+            selectedTables.add(tableInfo);
+        }
     }
 
     /**
@@ -434,18 +456,8 @@ public class MainGenerate extends DialogWrapper {
             }
         }
         // 保存配置
-        List<TableInfo> selectedTableInfoList;
-        if (!entityMode) {
-            selectedTableInfoList = cacheDataUtils.getDbTableList().stream()
-                    .map(dbTable -> TableInfoSettingsService.getInstance()
-                            .getTableInfo(dbTable)).collect(Collectors.toList());
-        } else {
-            TableInfo tableInfo = tableInfoService.getTableInfo(cacheDataUtils.getSelectPsiClass());
-            selectedTableInfoList = new ArrayList<>();
-            selectedTableInfoList.add(tableInfo);
-        }
         String finalSavePath = savePath;
-        selectedTableInfoList.forEach(tableInfo -> {
+        this.selectedTables.forEach(tableInfo -> {
             tableInfo.setSavePath(finalSavePath);
             tableInfo.setSavePackageName(packageField.getText());
             tableInfo.setPreName(preField.getText());
@@ -485,11 +497,7 @@ public class MainGenerate extends DialogWrapper {
      * 初始化表配置Panel
      */
     private void initTableConfigPanel() {
-        // 选中的表
-        List<TableInfo> selectedTables = CacheDataUtils.getInstance().getDbTableList().stream()
-                .map(dbTable -> TableInfoSettingsService.getInstance().getTableInfo(dbTable)).collect(Collectors.toList());
-
-        TableConfigJBTabs tabs = new TableConfigJBTabs(project, selectedTables);
+        TableConfigJBTabs tabs = new TableConfigJBTabs(project, this.selectedTables);
         int totalMinWidth = tabs.getTotalMinWidth();
         this.tableConfigPane.add(tabs.getComponent(), BorderLayout.CENTER);
         this.tableConfigPane.setMinimumSize(new Dimension(totalMinWidth, Math.max(300, totalMinWidth / 3) + 1));

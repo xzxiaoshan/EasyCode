@@ -34,6 +34,14 @@ public class MainActionGroup extends ActionGroup {
     private final CacheDataUtils cacheDataUtils = CacheDataUtils.getInstance();
 
     /**
+     * MainActionGroup
+     */
+    public MainActionGroup() {
+        // 如果子项为空，则不显示Group
+        this.getTemplatePresentation().setHideGroupIfEmpty(true);
+    }
+
+    /**
      * 根据右键在不同的选项上展示不同的子菜单
      *
      * @param event 事件对象
@@ -47,7 +55,7 @@ public class MainActionGroup extends ActionGroup {
             return AnAction.EMPTY_ARRAY;
         }
         if (project == null) {
-            return getEmptyAnAction(event);
+            return AnAction.EMPTY_ARRAY;
         }
 
         //获取选中的PSI元素
@@ -57,12 +65,12 @@ public class MainActionGroup extends ActionGroup {
             selectDbTable = (DbTable) psiElement;
         }
         if (selectDbTable == null) {
-            return getEmptyAnAction(event);
+            return AnAction.EMPTY_ARRAY;
         }
         //获取选中的所有表
         PsiElement[] psiElements = event.getData(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY);
         if (psiElements == null || psiElements.length == 0) {
-            return getEmptyAnAction(event);
+            return AnAction.EMPTY_ARRAY;
         }
         List<DbTable> dbTableList = new ArrayList<>();
         for (PsiElement element : psiElements) {
@@ -73,13 +81,12 @@ public class MainActionGroup extends ActionGroup {
             dbTableList.add(dbTable);
         }
         if (dbTableList.isEmpty()) {
-            return getEmptyAnAction(event);
+            return AnAction.EMPTY_ARRAY;
         }
 
         //保存数据到缓存
         cacheDataUtils.setDbTableList(dbTableList);
         cacheDataUtils.setSelectDbTable(selectDbTable);
-        this.visibleGroup(event.getPresentation(), false);
         return getMenuList();
     }
 
@@ -117,28 +124,6 @@ public class MainActionGroup extends ActionGroup {
         };
         // 返回所有菜单
         return new AnAction[]{mainAction, configAction, clearConfigAction};
-    }
-
-
-    /**
-     * 获取空菜单组
-     *
-     * @return 空菜单组
-     */
-    private AnAction[] getEmptyAnAction(AnActionEvent actionEvent) {
-        this.visibleGroup(actionEvent.getPresentation(), true);
-        return AnAction.EMPTY_ARRAY;
-    }
-
-    /**
-     * 显示隐藏Group
-     *
-     * @param presentation presentation
-     * @param hideGroup    isShowGroup
-     */
-    private void visibleGroup(Presentation presentation, boolean hideGroup) {
-        // 设置是否隐藏该组
-        presentation.setHideGroupIfEmpty(hideGroup);
     }
 
 }
