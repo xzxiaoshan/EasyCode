@@ -7,13 +7,14 @@ import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.PlatformCoreDataKeys;
-import com.intellij.openapi.actionSystem.Presentation;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiElement;
 import com.sjhy.plugin.dict.GlobalDict;
+import com.sjhy.plugin.service.CodeGenerateService;
 import com.sjhy.plugin.service.TableInfoSettingsService;
 import com.sjhy.plugin.tool.CacheDataUtils;
+import com.sjhy.plugin.tool.ProjectUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,10 +29,6 @@ import java.util.List;
  * @since 2018/07/17 13:10
  */
 public class MainActionGroup extends ActionGroup {
-    /**
-     * 缓存数据工具类
-     */
-    private final CacheDataUtils cacheDataUtils = CacheDataUtils.getInstance();
 
     /**
      * MainActionGroup
@@ -51,42 +48,12 @@ public class MainActionGroup extends ActionGroup {
     public AnAction @NotNull [] getChildren(@Nullable AnActionEvent event) {
         // 获取当前项目
         Project project = getEventProject(event);
-        if(event == null) {
+        if (event == null) {
             return AnAction.EMPTY_ARRAY;
         }
         if (project == null) {
             return AnAction.EMPTY_ARRAY;
         }
-
-        //获取选中的PSI元素
-        PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
-        DbTable selectDbTable = null;
-        if (psiElement instanceof DbTable) {
-            selectDbTable = (DbTable) psiElement;
-        }
-        if (selectDbTable == null) {
-            return AnAction.EMPTY_ARRAY;
-        }
-        //获取选中的所有表
-        PsiElement[] psiElements = event.getData(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY);
-        if (psiElements == null || psiElements.length == 0) {
-            return AnAction.EMPTY_ARRAY;
-        }
-        List<DbTable> dbTableList = new ArrayList<>();
-        for (PsiElement element : psiElements) {
-            if (!(element instanceof DbTable)) {
-                continue;
-            }
-            DbTable dbTable = (DbTable) element;
-            dbTableList.add(dbTable);
-        }
-        if (dbTableList.isEmpty()) {
-            return AnAction.EMPTY_ARRAY;
-        }
-
-        //保存数据到缓存
-        cacheDataUtils.setDbTableList(dbTableList);
-        cacheDataUtils.setSelectDbTable(selectDbTable);
         return getMenuList();
     }
 
@@ -96,34 +63,14 @@ public class MainActionGroup extends ActionGroup {
      * @return 子菜单数组
      */
     private AnAction[] getMenuList() {
-        String mainActionId = "com.sjhy.easy.code.action.generate";
-        String configActionId = "com.sjhy.easy.code.action.config";
+        String mainActionId = "com.sjhy.plugin.actions.GenerateMainAction";
+        String configActionId = "com.sjhy.plugin.actions.ConfigTableAction";
+        String clearConfigActionId = "com.sjhy.plugin.actions.ClearTableConfigAction";
         ActionManager actionManager = ActionManager.getInstance();
-        // 代码生成菜单
-        AnAction mainAction = actionManager.getAction(mainActionId);
-        if (mainAction == null) {
-            mainAction = new MainAction("Generate Code");
-            actionManager.registerAction(mainActionId, mainAction);
-        }
-        // 表配置菜单
-        AnAction configAction = actionManager.getAction(configActionId);
-        if (configAction == null) {
-            configAction = new ConfigAction("Config Table");
-            actionManager.registerAction(configActionId, configAction);
-        }
-        AnAction clearConfigAction = new AnAction("Clear Config") {
-            @Override
-            public void actionPerformed(@NotNull AnActionEvent e) {
-                DbTable dbTable = CacheDataUtils.getInstance().getSelectDbTable();
-                if (dbTable == null) {
-                    return;
-                }
-                TableInfoSettingsService.getInstance().removeTableInfo(dbTable);
-                Messages.showInfoMessage(dbTable.getName() + "表配置信息已重置成功", GlobalDict.TITLE_INFO);
-            }
-        };
         // 返回所有菜单
-        return new AnAction[]{mainAction, configAction, clearConfigAction};
+        return new AnAction[]{actionManager.getAction(mainActionId),
+                actionManager.getAction(configActionId),
+                actionManager.getAction(clearConfigActionId)};
     }
 
 }

@@ -1,5 +1,6 @@
 package com.sjhy.plugin.service;
 
+import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.project.Project;
 import com.sjhy.plugin.dto.GenerateOptions;
 import com.sjhy.plugin.entity.TableInfo;
@@ -42,4 +43,11 @@ public interface CodeGenerateService {
      * @return 生成好的代码
      */
     String generate(Template template, TableInfo tableInfo);
+
+    /**
+     * 从事件选择数据库Table的事件中读取选中的表信息并缓存
+     *
+     * @param event event
+     */
+    boolean cacheSelectedTables(@NotNull AnActionEvent event);
 }

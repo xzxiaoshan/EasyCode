@@ -3,17 +3,21 @@ package com.sjhy.plugin.actions;
 import com.intellij.database.model.DasColumn;
 import com.intellij.database.psi.DbTable;
 import com.intellij.database.util.DasUtil;
+import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.containers.JBIterable;
 import com.intellij.util.ui.JBUI;
 import com.sjhy.plugin.dict.GlobalDict;
 import com.sjhy.plugin.entity.TypeMapper;
 import com.sjhy.plugin.enums.MatchType;
+import com.sjhy.plugin.service.CodeGenerateService;
 import com.sjhy.plugin.tool.CacheDataUtils;
 import com.sjhy.plugin.tool.CurrGroupUtils;
 import com.sjhy.plugin.tool.StringUtils;
@@ -37,20 +41,7 @@ import java.util.regex.PatternSyntaxException;
  * @version 1.0.0
  * @since 2018/07/17 13:10
  */
-public class MainAction extends AnAction {
-
-    public MainAction(){
-        super();
-    }
-
-    /**
-     * 构造方法
-     *
-     * @param text 菜单名称
-     */
-    public MainAction(@Nullable String text) {
-        super(text);
-    }
+public class GenerateMainAction extends AnAction {
 
     /**
      * 处理方法
@@ -63,7 +54,8 @@ public class MainAction extends AnAction {
         if (project == null) {
             return;
         }
-
+        // 处理选中的表
+        CodeGenerateService.getInstance(project).cacheSelectedTables(event);
         // 校验类型映射
         if (!typeValidator(project, CacheDataUtils.getInstance().getSelectDbTable())) {
             // 没通过不打开窗口
@@ -73,6 +65,13 @@ public class MainAction extends AnAction {
         new MainGenerate(event.getProject()).show();
     }
 
+    @Override
+    public void update(@NotNull AnActionEvent e) {
+        super.update(e);
+        //获取选中的PSI元素
+        PsiElement psiElement = e.getData(CommonDataKeys.PSI_ELEMENT);
+        e.getPresentation().setEnabled(psiElement instanceof DbTable);
+    }
 
     /**
      * 类型校验，如果存在未知类型则引导用于去条件类型
@@ -179,5 +178,10 @@ public class MainAction extends AnAction {
             typeMapper.setColumnType(typeName);
             CurrGroupUtils.getCurrTypeMapperGroup().getElementList().add(typeMapper);
         }
+    }
+
+    @Override
+    public @NotNull ActionUpdateThread getActionUpdateThread() {
+        return ActionUpdateThread.BGT;
     }
 }

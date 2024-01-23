@@ -1,13 +1,19 @@
 package com.sjhy.plugin.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.intellij.database.psi.DbTable;
 import com.intellij.database.util.DasUtil;
 import com.intellij.database.util.DbUtil;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.PlatformCoreDataKeys;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
 import com.intellij.util.ReflectionUtil;
 import com.sjhy.plugin.dict.GlobalDict;
 import com.sjhy.plugin.dto.GenerateOptions;
@@ -20,6 +26,7 @@ import com.sjhy.plugin.service.CodeGenerateService;
 import com.sjhy.plugin.service.SettingsStorageService;
 import com.sjhy.plugin.service.TableInfoSettingsService;
 import com.sjhy.plugin.tool.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -256,4 +263,39 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
         });
         return result;
     }
+
+    @Override
+    public boolean cacheSelectedTables(@NotNull AnActionEvent event) {
+        //获取选中的PSI元素
+        PsiElement psiElement = event.getData(CommonDataKeys.PSI_ELEMENT);
+        DbTable selectDbTable = null;
+        if (psiElement instanceof DbTable) {
+            selectDbTable = (DbTable) psiElement;
+        }
+        if (selectDbTable == null) {
+            return false;
+        }
+        //获取选中的所有表
+        PsiElement[] psiElements = event.getData(PlatformCoreDataKeys.PSI_ELEMENT_ARRAY);
+        if (psiElements == null || psiElements.length == 0) {
+            return false;
+        }
+        List<DbTable> dbTableList = new ArrayList<>();
+        for (PsiElement element : psiElements) {
+            if (!(element instanceof DbTable)) {
+                continue;
+            }
+            DbTable dbTable = (DbTable) element;
+            dbTableList.add(dbTable);
+        }
+        if (dbTableList.isEmpty()) {
+            return false;
+        }
+
+        //保存数据到缓存
+        CacheDataUtils.getInstance().setDbTableList(dbTableList);
+        CacheDataUtils.getInstance().setSelectDbTable(selectDbTable);
+        return true;
+    }
+
 }

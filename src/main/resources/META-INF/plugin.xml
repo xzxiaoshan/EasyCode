@@ -296,12 +296,21 @@
         <!-- Add your actions here -->
         <group id="con.sjhy.easy.code.action" class="com.sjhy.plugin.actions.MainActionGroup" text="EasyCode"
                popup="true">
-            <!--生成代码菜单-->
+            <!--生成代码菜单组-->
             <add-to-group group-id="DatabaseViewPopupMenu" anchor="first"/>
         </group>
-        <action id="com.sjhy.easy.code.action.generate.toolbar" class="com.sjhy.plugin.actions.MainAction" text="Generate Code"
+        <!--生成代码Action-->
+        <action id="com.sjhy.plugin.actions.GenerateMainAction" class="com.sjhy.plugin.actions.GenerateMainAction" text="Generate Code" />
+        <!--配置表Action-->
+        <action id="com.sjhy.plugin.actions.ConfigTableAction" class="com.sjhy.plugin.actions.ConfigTableAction"
+                text="Config Table" />
+        <!--清理表Action-->
+        <action id="com.sjhy.plugin.actions.ClearTableConfigAction" class="com.sjhy.plugin.actions.ClearTableConfigAction"
+                text="Clear Config" />
+        <action id="com.sjhy.plugin.actions.GenerateMainAction.toolbar" class="com.sjhy.plugin.actions.GenerateMainAction" text="Generate Code"
                 icon="com.intellij.icons.ExpUiIcons.FileTypes.SourceMap">
             <add-to-group group-id="DatabaseViewToolbar" anchor="before" relative-to-action="Jdbc.OpenConsole.Any"/>
+                <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl G"/>
         </action>
     </actions>
 
