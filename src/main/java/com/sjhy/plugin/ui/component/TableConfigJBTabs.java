@@ -146,10 +146,10 @@ public class TableConfigJBTabs extends JBTabsImpl {
                     column.setMinWidth(120);
                     break;
                 case SELECT:
-                    if (StringUtils.isEmpty(columnConfig.getSelectValue())) {
+                    if (StringUtils.isEmpty(columnConfig.getDefaultValue())) {
                         column.setCellEditor(CellEditorFactory.createTextFieldEditor());
                     } else {
-                        String[] split = columnConfig.getSelectValue().split(",");
+                        String[] split = columnConfig.getDefaultValue().split(",");
                         ArrayList<String> list = new ArrayList<>(Arrays.asList(split));
                         // 添加一个空值作为默认值
                         list.add(0, "");

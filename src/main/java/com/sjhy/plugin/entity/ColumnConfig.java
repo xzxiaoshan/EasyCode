@@ -28,19 +28,19 @@ public class ColumnConfig implements AbstractItem<ColumnConfig>, Serializable {
      */
     private ColumnConfigType type;
     /**
-     * 可选值，逗号分割
+     * 默认值（如果是select类型，逗号分隔）
      */
-    private String selectValue;
+    private String defaultValue;
 
     public ColumnConfig(String title, ColumnConfigType type) {
         this.title = title;
         this.type = type;
     }
 
-    public ColumnConfig(String title, ColumnConfigType type, String selectValue) {
+    public ColumnConfig(String title, ColumnConfigType type, String defaultValue) {
         this.title = title;
         this.type = type;
-        this.selectValue = selectValue;
+        this.defaultValue = defaultValue;
     }
 
     @Override

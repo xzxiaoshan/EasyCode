@@ -1,8 +1,10 @@
 package com.sjhy.plugin.ui;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.intellij.icons.AllIcons;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.ui.ComboBoxTableRenderer;
+import com.intellij.util.ui.JBUI;
 import com.sjhy.plugin.dict.GlobalDict;
 import com.sjhy.plugin.dto.SettingsStorageDTO;
 import com.sjhy.plugin.entity.ColumnConfig;
@@ -14,8 +16,11 @@ import com.sjhy.plugin.ui.base.ConfigTableModel;
 import com.sjhy.plugin.ui.component.GroupNameComponent;
 import com.sjhy.plugin.ui.component.TableComponent;
 import org.jetbrains.annotations.Nullable;
+import sun.swing.DefaultLookup;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.text.AttributeSet;
@@ -69,12 +74,49 @@ public class ColumnConfigSettingForm implements Configurable, BaseSettings {
         TableComponent.Column<ColumnConfig> titleColumn = new TableComponent.Column<>("title", ColumnConfig::getTitle, ColumnConfig::setTitle, titleEditor, null);
 
         // 第三列选项
-        TableCellEditor selectValueEditor = CellEditorFactory.createTextFieldEditor();
-        TableComponent.Column<ColumnConfig> selectValueColumn = new TableComponent.Column<>("selectValue", ColumnConfig::getSelectValue, ColumnConfig::setSelectValue, selectValueEditor, null);
-        List<TableComponent.Column<ColumnConfig>> columns = Arrays.asList(typeColumn, titleColumn, selectValueColumn);
+        String column3Name = "defaultValue";
+        TableCellEditor defaultValueEditor = CellEditorFactory.createTextFieldEditor();
+        TableComponent.Column<ColumnConfig> defaultValueColumn = new TableComponent.Column<>(column3Name, ColumnConfig::getDefaultValue,
+                ColumnConfig::setDefaultValue, defaultValueEditor, null);
+
+        List<TableComponent.Column<ColumnConfig>> columns = Arrays.asList(typeColumn, titleColumn, defaultValueColumn);
 
         // 表格初始化
         this.tableComponent = new TableComponent<>(columns, this.currColumnConfigGroup.getElementList(), ColumnConfig.class);
+        // 自定义表头渲染处理
+        DefaultTableCellRenderer defaultTableCellHeaderRenderer = new DefaultTableCellRenderer(){
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                Color fgColor = null;
+                Color bgColor = null;
+                if (hasFocus) {
+                    fgColor = DefaultLookup.getColor(this, ui, "TableHeader.focusCellForeground");
+                    bgColor = DefaultLookup.getColor(this, ui, "TableHeader.focusCellBackground");
+                }
+                JTableHeader header = table.getTableHeader();
+                if (fgColor == null) {
+                    fgColor = header.getForeground();
+                }
+                if (bgColor == null) {
+                    bgColor = header.getBackground();
+                }
+                setForeground(fgColor);
+                setBackground(bgColor);
+                setBorder(JBUI.Borders.emptyLeft(5));
+
+                if(column3Name.equals(value)) {
+                    label.setToolTipText("1.SELECT类型使用英文逗号分隔多个下拉选项<br>2.TEXT类型为文本默认值<br>3.BOOLEAN类型可以填写true设定默认勾选");
+                    label.setIcon(AllIcons.General.ContextHelp);
+                } else {
+                    label.setIcon(null);
+                    label.setToolTipText(null);
+                }
+                return label;
+            }
+        };
+        defaultTableCellHeaderRenderer.setHorizontalTextPosition(SwingConstants.LEFT);
+        this.tableComponent.getTable().getTableHeader().setDefaultRenderer(defaultTableCellHeaderRenderer);
         this.mainPanel.add(this.tableComponent.createPanel(), BorderLayout.CENTER);
     }
 

@@ -132,8 +132,23 @@ public class ConfigTableModel extends DefaultTableModel implements EditableModel
             for (ColumnConfig columnConfig : CurrGroupUtils.getCurrColumnConfigGroup().getElementList()) {
                 Object obj = ext.get(columnConfig.getTitle());
                 if (obj == null) {
+                    String configDefaultVal = columnConfig.getDefaultValue();
+                    // 设置默认值
                     if (columnConfig.getType() == ColumnConfigType.BOOLEAN) {
-                        values.add(false);
+                        if(!StringUtils.isEmpty(configDefaultVal)) {
+                            values.add(Boolean.valueOf(configDefaultVal));
+                        } else {
+                            values.add(false);
+                        }
+                    } else if(columnConfig.getType() == ColumnConfigType.TEXT) {
+                        values.add(configDefaultVal == null ? "" : configDefaultVal);
+                    } else if(columnConfig.getType() == ColumnConfigType.SELECT) {
+                        // 默认选择第一个
+                        if(!StringUtils.isEmpty(configDefaultVal)) {
+                            values.add(configDefaultVal.split(",")[0]);
+                        } else {
+                            values.add("");
+                        }
                     } else {
                         values.add("");
                     }
